@@ -1,5 +1,5 @@
 id: 24
-title: "LLM の使い方 (Anthropic SDK)"
+title: "LLM の使い方 (OpenAI SDK)"
 phase: E
 prerequisites: [10]
 learning_goals:
@@ -13,18 +13,24 @@ pages:
     title: "LLM API の基本構造"
     markdown: |
       ## メッセージは role / content の組
-      Claude API は次のような構造でリクエストを送ります。
+      OpenAI Chat Completions API は次のような構造でリクエストを送ります。
 
       - **system**: モデルへの指示（人格・出力フォーマット等）
       - **user / assistant**: 会話履歴
 
       ```python
-      anthropic.Anthropic().messages.create(
-          model="claude-sonnet-4-5",
+      from openai import OpenAI
+      client = OpenAI()  # api_key は環境変数 OPENAI_API_KEY を自動で読む
+
+      response = client.chat.completions.create(
+          model="gpt-4o-mini",
           max_tokens=200,
-          system="あなたは投資アナリストです",
-          messages=[{"role": "user", "content": "シャープレシオとは？"}],
+          messages=[
+              {"role": "system", "content": "あなたは投資アナリストです"},
+              {"role": "user",   "content": "シャープレシオとは？"},
+          ],
       )
+      print(response.choices[0].message.content)
       ```
 
       この章ではキー無しで動く **擬似 LLM 関数** を作って構造の理解を深めます。
@@ -44,6 +50,8 @@ pages:
       ## system は方向付け
       `system` メッセージで「どういう立場・口調で答えるか」を指示します。
       LLM の出力品質は **system プロンプト次第** で大きく変わります。
+
+      OpenAI SDK では messages リストの **先頭** に `{"role": "system", ...}` を入れます。
     sample_code: |
       def fake_llm(system, user_msg):
           return f"[system: {system}]\n[user: {user_msg}]\n→ 回答を生成"
@@ -57,6 +65,7 @@ pages:
     title: "メッセージリストを組み立てよう"
     prompt: |
       `messages` リストに **user 役割のメッセージ** を 1 件追加してください。
+      OpenAI / Anthropic / その他主要 LLM API でこの形式は共通です。
     code_template: |
       messages = [
           {{slot:msg}},
@@ -75,7 +84,7 @@ pages:
       - "辞書で role='user', content='...' を持つ。"
       - '`{"role": "user", "content": "Hello"}`'
     stickman_feedback:
-      correct: "API への基本フォーマット、これでOK。"
+      correct: "API への基本フォーマット、これで OK。"
       wrong_hint1: '`{"role": "user", "content": "Hello"}`'
       wrong_hint2: '`{"role": "user", "content": "Hello"}`'
       wrong_hint3: '`{"role": "user", "content": "Hello"}`'
@@ -114,6 +123,9 @@ pages:
     prompt: |
       ざっくり **「文字数 ÷ 4 がトークン数」** と概算する関数を作ってください
       （日本語ではより多いですが、概算指標として）。
+
+      OpenAI の料金は 1M トークンあたり $0.15〜（gpt-4o-mini）から。
+      実運用時は `tiktoken` ライブラリで正確に数えます。
     code_template: |
       def estimate_tokens(text):
           return {{slot:expr}}

@@ -178,6 +178,13 @@ class MainWindow(QMainWindow):
             self.kernel.shutdown()
         except Exception:  # noqa: BLE001
             logging.exception("kernel shutdown failed")
+        # Make sure any Streamlit subprocess launched from chapter 25 dies
+        # with the main app — otherwise it keeps listening on port 8501.
+        try:
+            from .ui.pages.sample_page import StreamlitLauncher
+            StreamlitLauncher.terminate()
+        except Exception:  # noqa: BLE001
+            logging.exception("streamlit shutdown failed")
         super().closeEvent(e)
 
 

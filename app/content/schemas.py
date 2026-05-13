@@ -111,6 +111,10 @@ class SamplePage(BaseModel):
     markdown: str
     sample_code: str = ""
     runnable: bool = True
+    # "kernel" (default) runs the snippet in the in-app Jupyter kernel.
+    # "streamlit" writes it to a temp file and spawns `streamlit run` so the
+    # learner sees a live Streamlit dashboard in their default browser.
+    runner: Literal["kernel", "streamlit"] = "kernel"
     expected_output: str = ""
     stickman: StickmanMood = "explain"
     stickman_speech: str = "サンプルを見てみよう。実行ボタンを押すと結果が見られるよ。"

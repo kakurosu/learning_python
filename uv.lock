@@ -1738,6 +1738,25 @@ wheels = [
 ]
 
 [[package]]
+name = "openai"
+version = "2.36.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "jiter" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "tqdm" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/a1/4d5e84cf51720fc1526cc49e10ac1961abcccb55b0efb3d970db1e9a2728/openai-2.36.0.tar.gz", hash = "sha256:139dea0edd2f1b30c33d46ae1a6929e03906254140318e4608e98fe8c566f2e7", size = 753003, upload-time = "2026-05-07T17:33:17.075Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/1c/5d43735b2553baae2a5e899dcbcd0670a86930d993184d72ca909bf11c9b/openai-2.36.0-py3-none-any.whl", hash = "sha256:143f6194b548dbc2c921af1f1b03b9f14c85fed8a75b5b516f5bcc11a2a50c63", size = 1302361, upload-time = "2026-05-07T17:33:15.063Z" },
+]
+
+[[package]]
 name = "packaging"
 version = "26.2"
 source = { registry = "https://pypi.org/simple" }
@@ -3116,6 +3135,7 @@ dependencies = [
     { name = "jupyter-client" },
     { name = "matplotlib" },
     { name = "numpy" },
+    { name = "openai" },
     { name = "pandas" },
     { name = "pydantic" },
     { name = "pygments" },
@@ -3127,6 +3147,7 @@ dependencies = [
     { name = "scipy" },
     { name = "sqlalchemy" },
     { name = "statsmodels" },
+    { name = "streamlit" },
 ]
 
 [package.optional-dependencies]
@@ -3143,9 +3164,6 @@ dev = [
     { name = "pytest-qt" },
     { name = "ruff" },
 ]
-streamlit = [
-    { name = "streamlit" },
-]
 
 [package.metadata]
 requires-dist = [
@@ -3156,6 +3174,7 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.8" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10" },
     { name = "numpy", specifier = ">=1.26" },
+    { name = "openai", specifier = ">=1.40" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "playwright", marker = "extra == 'automation'", specifier = ">=1.42" },
     { name = "pyautogui", marker = "extra == 'automation'", specifier = ">=0.9.54" },
@@ -3172,10 +3191,10 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.12" },
     { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "statsmodels", specifier = ">=0.14" },
-    { name = "streamlit", marker = "extra == 'streamlit'", specifier = ">=1.32" },
+    { name = "streamlit", specifier = ">=1.32" },
     { name = "torch", marker = "extra == 'deep'", specifier = ">=2.2" },
 ]
-provides-extras = ["deep", "streamlit", "automation", "dev"]
+provides-extras = ["deep", "automation", "dev"]
 
 [[package]]
 name = "sympy"
@@ -3278,6 +3297,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/76/4921c00511f88af86a33de770d64141170f1cfd9c00311aea689949e274e/tornado-6.5.5-cp39-abi3-win32.whl", hash = "sha256:dd3eafaaeec1c7f2f8fdcd5f964e8907ad788fe8a5a32c4426fbbdda621223b7", size = 448582, upload-time = "2026-03-10T21:30:57.142Z" },
     { url = "https://files.pythonhosted.org/packages/2c/23/f6c6112a04d28eed765e374435fb1a9198f73e1ec4b4024184f21faeb1ad/tornado-6.5.5-cp39-abi3-win_amd64.whl", hash = "sha256:6443a794ba961a9f619b1ae926a2e900ac20c34483eea67be4ed8f1e58d3ef7b", size = 448990, upload-time = "2026-03-10T21:30:58.857Z" },
     { url = "https://files.pythonhosted.org/packages/b7/c8/876602cbc96469911f0939f703453c1157b0c826ecb05bdd32e023397d4e/tornado-6.5.5-cp39-abi3-win_arm64.whl", hash = "sha256:2c9a876e094109333f888539ddb2de4361743e5d21eece20688e3e351e4990a6", size = 448016, upload-time = "2026-03-10T21:31:00.43Z" },
+]
+
+[[package]]
+name = "tqdm"
+version = "4.67.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/09/a9/6ba95a270c6f1fbcd8dac228323f2777d886cb206987444e4bce66338dd4/tqdm-4.67.3.tar.gz", hash = "sha256:7d825f03f89244ef73f1d4ce193cb1774a8179fd96f31d7e1dcde62092b960bb", size = 169598, upload-time = "2026-02-03T17:35:53.048Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/16/e1/3079a9ff9b8e11b846c6ac5c8b5bfb7ff225eee721825310c91b3b50304f/tqdm-4.67.3-py3-none-any.whl", hash = "sha256:ee1e4c0e59148062281c49d80b25b67771a127c85fc9676d3be5f243206826bf", size = 78374, upload-time = "2026-02-03T17:35:50.982Z" },
 ]
 
 [[package]]
