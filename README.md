@@ -7,11 +7,16 @@
 - Windows / macOS / Linux
 - Python 3.11+
 - メモリ 1GB（PyTorch 章は 2GB+）
-- [uv](https://docs.astral.sh/uv/) (パッケージマネージャ)
+- [uv](https://docs.astral.sh/uv/) **0.11.6 以上** (パッケージマネージャ)
 
 ## セットアップ
 
-`uv` がインストール済みであることを前提とします（未インストールなら `winget install astral-sh.uv` / `brew install uv` / `curl -LsSf https://astral.sh/uv/install.sh | sh`）。
+`uv` 0.11.6 以上がインストール済みであることを前提とします（未インストールなら `pip install uv==0.11.6` / `winget install astral-sh.uv` / `brew install uv` / `curl -LsSf https://astral.sh/uv/install.sh | sh`）。
+
+```bash
+# バージョン確認
+uv --version    # → uv 0.11.6 (...) 以上
+```
 
 ```bash
 cd study_python_finance
