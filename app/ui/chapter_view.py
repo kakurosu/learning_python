@@ -16,10 +16,10 @@ from PyQt6.QtWidgets import (
 )
 
 from ..content.loader import assemble_code
-from ..content.schemas import Chapter, ExercisePage, SamplePage
+from ..content.schemas import Chapter, ExercisePage, ReadingPage, SamplePage
 from ..db.models import ChapterStatus
 from ..db.repo import Repository
-from ..grading.judge import GradingResult, grade_exercise
+from ..grading.judge import GradingResult, grade_exercise, grade_reading
 from ..kernel.manager import KernelSession
 from ..llm.claude_client import ClaudeClient
 from ..resources.theme import (
@@ -30,6 +30,7 @@ from ..resources.theme import (
     PHASE_LABELS,
 )
 from .pages.exercise_page import ExercisePageWidget
+from .pages.reading_page import ReadingPageWidget
 from .pages.result_page import ResultPageWidget
 from .pages.sample_page import SamplePageWidget
 from .stickman import StickmanStrip
@@ -157,12 +158,38 @@ class ChapterView(QWidget):
         self._footer.setStyleSheet(f"QFrame {{ background: white; border-top: 1px solid {LINE}; }}")
         foot_layout = QHBoxLayout(self._footer)
         foot_layout.setContentsMargins(32, 10, 32, 10)
+        # Footer buttons get explicit inline styles. The global QSS gets
+        # suppressed in some embedded-stack contexts which produced an
+        # unreadable white-on-white button — see result_page.py for the
+        # canonical primary/secondary stylesheets that we mirror here.
+        _primary_qss = (
+            "QPushButton {"
+            f" background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
+            " border-radius: 0; padding: 8px 22px; font-size: 11px;"
+            " font-weight: 700; min-width: 96px; min-height: 24px;"
+            " }"
+            "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
+            "QPushButton:pressed { background: #991B1B; border-color: #991B1B; }"
+            "QPushButton:disabled {"
+            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+        )
+        _secondary_qss = (
+            "QPushButton {"
+            f" background: white; color: {INK}; border: 1px solid {INK};"
+            " border-radius: 0; padding: 8px 22px; font-size: 11px;"
+            " font-weight: 700; min-width: 96px; min-height: 24px;"
+            " }"
+            f"QPushButton:hover {{ background: {INK}; color: white; }}"
+            "QPushButton:disabled {"
+            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+        )
         self._prev_btn = QPushButton("Back", self._footer)
-        self._prev_btn.setProperty("variant", "secondary")
+        self._prev_btn.setStyleSheet(_secondary_qss)
         self._prev_btn.clicked.connect(self._go_prev)
         foot_layout.addWidget(self._prev_btn)
         foot_layout.addStretch(1)
         self._next_btn = QPushButton("Next", self._footer)
+        self._next_btn.setStyleSheet(_primary_qss)
         self._next_btn.clicked.connect(self._on_next_clicked)
         foot_layout.addWidget(self._next_btn)
 
@@ -189,6 +216,9 @@ class ChapterView(QWidget):
                 w = ExercisePageWidget(p)
                 w.submit_requested.connect(self._on_submit)
                 w.show_solution_requested.connect(self._on_show_solution)
+            elif isinstance(p, ReadingPage):
+                w = ReadingPageWidget(p)
+                w.submit_requested.connect(self._on_reading_submit)
             else:
                 w = QLabel(f"unknown page kind: {type(p).__name__}")
             self._page_widgets.append(w)
@@ -237,6 +267,11 @@ class ChapterView(QWidget):
             self._stickman.set_mood("explain")
             self._stickman.set_speech("コードの空欄を埋めて提出ボタンを押そう。")
             # On exercise pages, the footer button SUBMITS the answer.
+            self._next_btn.setText("Submit")
+            self._next_btn.setEnabled(True)
+        elif isinstance(page, ReadingPage):
+            self._stickman.set_mood(page.stickman)
+            self._stickman.set_speech(page.stickman_speech)
             self._next_btn.setText("Submit")
             self._next_btn.setEnabled(True)
         self._prev_btn.setEnabled(self._current_index > 0)
@@ -327,6 +362,8 @@ class ChapterView(QWidget):
         widget = self._page_widgets[self._current_index]
         if isinstance(widget, ExercisePageWidget):
             widget.reset_for_retry()
+        elif isinstance(widget, ReadingPageWidget):
+            widget.reset_for_retry()
         self._show_current_page()
         self._stickman.set_mood("explain")
         self._stickman.set_speech("もう一度トライ。")
@@ -346,7 +383,59 @@ class ChapterView(QWidget):
             # Footer "SUBMIT" delegates to the exercise page submit handler.
             self._on_submit()
             return
+        if isinstance(page, ReadingPage):
+            self._on_reading_submit()
+            return
         self._advance()
+
+    # ------------------------------------------------------------------
+    def _on_reading_submit(self) -> None:
+        idx = self._current_index
+        widget = self._page_widgets[idx]
+        if not isinstance(widget, ReadingPageWidget):
+            return
+        page = widget.page
+        selected = widget.selected_index()
+        if selected is None:
+            widget.show_unanswered_notice()
+            return
+
+        gr = grade_reading(page, selected)
+        self.repo.record_submission(
+            user_id=self.user_id,
+            chapter_id=self.chapter.id,
+            page_index=idx,
+            code=f"reading: selected={selected}",
+            passed=gr.overall_passed,
+            stdout="",
+            stderr="",
+            hint_level_shown=0,
+        )
+
+        if gr.overall_passed:
+            self._stickman.set_mood("happy")
+            self._stickman.set_speech(page.stickman_feedback.correct)
+            stickman_wrong = page.stickman_feedback.wrong_hint1
+        else:
+            self._stickman.set_mood("sad")
+            stickman_wrong = page.stickman_feedback.wrong_hint1
+            self._stickman.set_speech(stickman_wrong)
+
+        # Reuse the exercise result overlay. ResultPageWidget tolerates a
+        # ``page=None`` chapter context (it only uses page for the Ask AI
+        # button, which we disable for reading by passing llm=None below).
+        self._result_overlay = ResultPageWidget(
+            gr,
+            stickman_speech_correct=page.stickman_feedback.correct,
+            stickman_speech_wrong=stickman_wrong,
+            chapter=self.chapter,
+            page=None,
+            llm=None,
+        )
+        self._result_overlay.next_requested.connect(self._advance)
+        self._result_overlay.retry_requested.connect(self._retry_current)
+        self._swap_slot(self._result_overlay)
+        self._footer.setVisible(False)
 
     def _go_prev(self) -> None:
         if self._current_index <= 0:

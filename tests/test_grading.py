@@ -13,9 +13,10 @@ from app.content.schemas import (
     Blank,
     ExercisePage,
     NamespaceCheck,
+    ReadingPage,
     StdoutRegex,
 )
-from app.grading.judge import check_blank, check_blanks, grade_exercise
+from app.grading.judge import check_blank, check_blanks, grade_exercise, grade_reading
 
 
 def _blank(id_: str, canonical: str, patterns: list[str]) -> Blank:
@@ -116,6 +117,48 @@ def test_grade_exercise_wrong_path(kernel) -> None:
     )
     res = grade_exercise(page, {"val": "0"}, kernel)
     assert not res.overall_passed
+
+
+# ---------------------------------------------------------------------------
+# Reading grading (kernel-free)
+# ---------------------------------------------------------------------------
+
+
+def _reading_page() -> ReadingPage:
+    return ReadingPage(
+        kind="reading",
+        title="t",
+        prompt="p",
+        code="print('hi')",
+        choices=["a", "b", "c"],
+        correct_index=1,
+        explanation="b is correct",
+    )
+
+
+def test_grade_reading_correct() -> None:
+    page = _reading_page()
+    res = grade_reading(page, 1)
+    assert res.overall_passed
+    assert res.assembled_code == page.code
+    assert res.test_results[0].passed
+    assert "b is correct" in res.test_results[0].detail
+
+
+def test_grade_reading_wrong() -> None:
+    page = _reading_page()
+    res = grade_reading(page, 0)
+    assert not res.overall_passed
+    assert not res.test_results[0].passed
+    detail = res.test_results[0].detail
+    assert "a" in detail and "b" in detail
+
+
+def test_grade_reading_unanswered() -> None:
+    page = _reading_page()
+    res = grade_reading(page, None)
+    assert not res.overall_passed
+    assert "選択肢" in res.test_results[0].detail
 
 
 @pytest.mark.kernel

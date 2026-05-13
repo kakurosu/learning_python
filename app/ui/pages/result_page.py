@@ -179,17 +179,40 @@ class ResultPageWidget(QWidget):
             self._llm_response.setVisible(False)
             layout.addWidget(self._llm_response)
 
-        # Action buttons
+        # Action buttons — explicit inline style so the button is always
+        # visibly filled (the global QSS was getting suppressed when the
+        # ResultPageWidget was instantiated inside a stacked slot, leaving
+        # the button white-on-white).
         btn_row = QHBoxLayout()
         btn_row.setSpacing(8)
+        primary_qss = (
+            "QPushButton {"
+            f" background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
+            " border-radius: 0; padding: 10px 28px; font-size: 12px;"
+            " font-weight: 700; min-width: 120px; min-height: 28px;"
+            " }"
+            "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
+            "QPushButton:pressed { background: #991B1B; border-color: #991B1B; }"
+            "QPushButton:focus { outline: none; }"
+        )
+        secondary_qss = (
+            "QPushButton {"
+            f" background: white; color: {INK}; border: 1px solid {INK};"
+            " border-radius: 0; padding: 10px 28px; font-size: 12px;"
+            " font-weight: 700; min-width: 120px; min-height: 28px;"
+            " }"
+            f"QPushButton:hover {{ background: {INK}; color: white; }}"
+            "QPushButton:focus { outline: none; }"
+        )
         if result.overall_passed:
             self._next_btn = QPushButton("Next", inner)
+            self._next_btn.setStyleSheet(primary_qss)
             self._next_btn.setDefault(True)
             self._next_btn.clicked.connect(self.next_requested.emit)
             btn_row.addWidget(self._next_btn)
         else:
             self._retry_btn = QPushButton("Retry", inner)
-            self._retry_btn.setProperty("variant", "secondary")
+            self._retry_btn.setStyleSheet(secondary_qss)
             self._retry_btn.setDefault(True)
             self._retry_btn.clicked.connect(self.retry_requested.emit)
             btn_row.addWidget(self._retry_btn)

@@ -4,6 +4,7 @@ A chapter YAML is structured as an ordered list of pages.
 Each page is one of:
 - ``sample``: explanation + example code (read-only, runnable).
 - ``exercise``: fill-in-the-blank exercise with optional test cases.
+- ``reading``: read a code snippet and choose what it represents (multiple choice).
 
 Result pages are not stored in YAML; the UI inserts them dynamically after grading.
 """
@@ -11,9 +12,9 @@ Result pages are not stored in YAML; the UI inserts them dynamically after gradi
 from __future__ import annotations
 
 import re
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
 # ---------------------------------------------------------------------------
 # Common reusable types
@@ -140,7 +141,39 @@ class ExercisePage(BaseModel):
         return v
 
 
-Page = Annotated[SamplePage | ExercisePage, Field(discriminator="kind")]
+class ReadingPage(BaseModel):
+    """Read-and-choose page: show a code snippet, ask what it represents.
+
+    Used for the dedicated "reading" chapters that revisit code from earlier
+    chapters and quiz the learner with a multiple-choice question. No kernel
+    execution is involved — grading is a pure index comparison.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+    kind: Literal["reading"]
+    title: str
+    prompt: str
+    code: str
+    code_file_label: str = "snippet.py"
+    choices: list[str] = Field(min_length=2)
+    correct_index: int = Field(ge=0)
+    explanation: str = ""
+    stickman: StickmanMood = "explain"
+    stickman_speech: str = "コードをよく読んで、正しい選択肢を選ぼう。"
+    stickman_feedback: StickmanFeedback = Field(default_factory=StickmanFeedback)
+
+    @field_validator("correct_index")
+    @classmethod
+    def _index_in_range(cls, v: int, info: ValidationInfo) -> int:
+        choices: list[Any] = info.data.get("choices") or []
+        if choices and v >= len(choices):
+            raise ValueError(
+                f"correct_index {v} is out of range for {len(choices)} choices"
+            )
+        return v
+
+
+Page = Annotated[SamplePage | ExercisePage | ReadingPage, Field(discriminator="kind")]
 
 
 # ---------------------------------------------------------------------------

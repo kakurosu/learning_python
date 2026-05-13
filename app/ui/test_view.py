@@ -107,18 +107,45 @@ class TestView(QWidget):
         foot_layout.setContentsMargins(32, 10, 32, 10)
         foot_layout.setSpacing(8)
 
+        # Explicit inline styles — defensive against the global QSS being
+        # suppressed inside stacked contexts (the same fix applied to
+        # result_page.py and chapter_view.py).
+        _primary_qss = (
+            "QPushButton {"
+            f" background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
+            " border-radius: 0; padding: 8px 22px; font-size: 11px;"
+            " font-weight: 700; min-width: 96px; min-height: 24px;"
+            " }"
+            "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
+            "QPushButton:pressed { background: #991B1B; border-color: #991B1B; }"
+            "QPushButton:disabled {"
+            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+        )
+        _secondary_qss = (
+            "QPushButton {"
+            f" background: white; color: {INK}; border: 1px solid {INK};"
+            " border-radius: 0; padding: 8px 22px; font-size: 11px;"
+            " font-weight: 700; min-width: 96px; min-height: 24px;"
+            " }"
+            f"QPushButton:hover {{ background: {INK}; color: white; }}"
+            "QPushButton:disabled {"
+            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+        )
+
         self._skip_btn = QPushButton("Skip", footer)
-        self._skip_btn.setProperty("variant", "secondary")
+        self._skip_btn.setStyleSheet(_secondary_qss)
         self._skip_btn.clicked.connect(self._on_skip)
         foot_layout.addWidget(self._skip_btn)
 
         foot_layout.addStretch(1)
 
         self._submit_btn = QPushButton("Submit", footer)
+        self._submit_btn.setStyleSheet(_primary_qss)
         self._submit_btn.clicked.connect(self._on_submit_question)
         foot_layout.addWidget(self._submit_btn)
 
         self._next_btn = QPushButton("Next Question", footer)
+        self._next_btn.setStyleSheet(_primary_qss)
         self._next_btn.clicked.connect(self._on_next)
         self._next_btn.hide()
         foot_layout.addWidget(self._next_btn)
@@ -214,6 +241,14 @@ class TestView(QWidget):
         layout.addSpacing(16)
 
         start_btn = QPushButton("Start Test", inner)
+        start_btn.setStyleSheet(
+            "QPushButton {"
+            f" background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
+            " border-radius: 0; padding: 10px 32px; font-size: 12px;"
+            " font-weight: 700; min-width: 160px;"
+            " }"
+            "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
+        )
         start_btn.setMinimumHeight(48)
         start_btn.clicked.connect(self._start_test)
         btn_row = QHBoxLayout()
@@ -436,6 +471,14 @@ class TestView(QWidget):
 
         btn_row = QHBoxLayout()
         home_btn = QPushButton("ホームに戻る", inner)
+        home_btn.setStyleSheet(
+            "QPushButton {"
+            f" background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
+            " border-radius: 0; padding: 10px 32px; font-size: 12px;"
+            " font-weight: 700; min-width: 160px;"
+            " }"
+            "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
+        )
         home_btn.clicked.connect(self.back_to_launcher.emit)
         btn_row.addWidget(home_btn)
         btn_row.addStretch(1)

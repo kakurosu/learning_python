@@ -24,6 +24,7 @@ from ..content.schemas import (
     ExercisePage,
     NamespaceCheck,
     PytestLike,
+    ReadingPage,
     StdoutRegex,
     TestCase,
 )
@@ -177,4 +178,52 @@ def grade_exercise(
         assembled_code=assembled,
         execution=execution,
         failed_blanks=[r.blank_id for r in form_results if not r.passed],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Reading (multiple-choice) grading
+# ---------------------------------------------------------------------------
+
+
+def grade_reading(page: ReadingPage, selected_index: int | None) -> GradingResult:
+    """Multiple-choice grading. Kernel-free.
+
+    Returns a ``GradingResult`` whose shape matches the exercise pipeline so
+    the result overlay (``ResultPageWidget``) can be reused unchanged.
+    """
+    if selected_index is None or selected_index < 0:
+        # Treated as a failed submission rather than an error so the result
+        # overlay can show a coherent "Incorrect" with guidance.
+        return GradingResult(
+            overall_passed=False,
+            form_results=[],
+            test_results=[
+                TestCaseResult(
+                    kind="reading",
+                    passed=False,
+                    detail="選択肢が選ばれていません。",
+                )
+            ],
+            assembled_code=page.code,
+            execution=None,
+            failed_blanks=[],
+        )
+
+    passed = selected_index == page.correct_index
+    if passed:
+        detail = page.explanation or "正解。次の問題に進もう。"
+    else:
+        picked = page.choices[selected_index]
+        answer = page.choices[page.correct_index]
+        explanation = f" — {page.explanation}" if page.explanation else ""
+        detail = f"選択した: {picked!s}（正解: {answer!s}）{explanation}"
+
+    return GradingResult(
+        overall_passed=passed,
+        form_results=[],
+        test_results=[TestCaseResult(kind="reading", passed=passed, detail=detail)],
+        assembled_code=page.code,
+        execution=None,
+        failed_blanks=[],
     )

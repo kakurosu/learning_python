@@ -5,9 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from app.content.loader import ContentError, assemble_code, load_chapter, load_chapters
-from app.content.schemas import ExercisePage, SamplePage
+from app.content.schemas import ExercisePage, ReadingPage, SamplePage
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CHAPTERS_DIR = REPO_ROOT / "content" / "chapters"
@@ -59,3 +60,45 @@ def test_chapter_id_mismatch_raises(tmp_path: Path) -> None:
     (tmp_path / "01_x.yaml").write_text(yaml_text, encoding="utf-8")
     with pytest.raises(ContentError):
         load_chapters(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# Reading chapters
+# ---------------------------------------------------------------------------
+
+
+def test_load_reading_phase_a_chapter() -> None:
+    ch = load_chapter(CHAPTERS_DIR / "27_reading_phase_a.yaml")
+    assert ch.id == 27
+    assert ch.phase == "A"
+    assert ch.pages, "reading chapter should have pages"
+    assert all(isinstance(p, ReadingPage) for p in ch.pages)
+    first = ch.pages[0]
+    assert isinstance(first, ReadingPage)
+    assert len(first.choices) >= 2
+    assert 0 <= first.correct_index < len(first.choices)
+
+
+def test_load_all_reading_chapters() -> None:
+    """All 6 reading chapters (27-32) should load and contain only reading pages."""
+    for chapter_id in (27, 28, 29, 30, 31, 32):
+        matches = list(CHAPTERS_DIR.glob(f"{chapter_id:02d}_*.yaml"))
+        assert matches, f"reading chapter {chapter_id} YAML missing"
+        ch = load_chapter(matches[0])
+        assert ch.id == chapter_id
+        assert all(isinstance(p, ReadingPage) for p in ch.pages), (
+            f"chapter {chapter_id} should contain only reading pages"
+        )
+
+
+def test_reading_correct_index_out_of_range_raises() -> None:
+    """correct_index >= len(choices) must fail validation."""
+    with pytest.raises(ValidationError):
+        ReadingPage(
+            kind="reading",
+            title="bad",
+            prompt="p",
+            code="x = 1",
+            choices=["a", "b"],
+            correct_index=5,  # out of range
+        )

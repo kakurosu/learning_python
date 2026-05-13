@@ -1,0 +1,85 @@
+id: 31
+title: "コードを読もう — Phase E 外部連携の総復習"
+phase: E
+prerequisites: [23, 24]
+learning_goals:
+  - "requests + BeautifulSoup と Anthropic SDK を使ったコードを読み解ける"
+
+pages:
+  # ─── Q1: requests（章 23） ──────────────────────────
+  - kind: reading
+    title: "HTTP GET の取得（章 23 復習）"
+    prompt: |
+      下のコードについて、`html` の中身として正しいものを選んでください。
+    code: |
+      import requests
+      response = requests.get("https://example.com")
+      html = response.text
+    code_file_label: "q01.py"
+    choices:
+      - "レスポンスの HTML 文字列（str 型）"
+      - "レスポンスのバイト列（bytes 型）"
+      - "レスポンスのステータスコード（int 型）"
+      - "レスポンスのヘッダ辞書（dict 型）"
+    correct_index: 0
+    explanation: |
+      `requests.Response.text` はエンコードを推定して **str に変換した本文** を返します。バイト列が欲しいときは `.content`、ステータスは `.status_code`、ヘッダは `.headers`。
+
+  # ─── Q2: BeautifulSoup の find_all（章 23） ────────
+  - kind: reading
+    title: "リンク抽出（章 23 復習）"
+    prompt: |
+      下のコードが取得しているものとして正しいものを選んでください。
+    code: |
+      from bs4 import BeautifulSoup
+      soup = BeautifulSoup(html, "html.parser")
+      result = [a.get("href") for a in soup.find_all("a")]
+    code_file_label: "q02.py"
+    choices:
+      - "ページ内のすべてのテキストノード"
+      - "ページ内のすべてのリンク先 URL（<a> タグの href 属性）"
+      - "ページ内のすべての画像 URL"
+      - "ページのタイトル文字列"
+    correct_index: 1
+    explanation: |
+      `find_all("a")` で全 `<a>` 要素を取り、`a.get("href")` で属性値を抽出。スクレイピングで「ページ内の全リンク」を取る定番パターンです。
+
+  # ─── Q3: Anthropic クライアント初期化（章 24） ──────
+  - kind: reading
+    title: "Anthropic SDK の認証（章 24 復習）"
+    prompt: |
+      下のコードについて、`api_key` をどこから取るか正しいものを選んでください。
+    code: |
+      import os
+      from anthropic import Anthropic
+      client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    code_file_label: "q03.py"
+    choices:
+      - "ハードコードされた文字列リテラル"
+      - "環境変数 ANTHROPIC_API_KEY"
+      - "コマンドライン引数"
+      - "ユーザー入力 (input)"
+    correct_index: 1
+    explanation: |
+      `os.environ["ANTHROPIC_API_KEY"]` で **環境変数** から取得しています。`.env` ファイルからロードする際もこの方式が標準。コードにキーを書くと漏洩のリスクがあるため避けます。
+
+  # ─── Q4: messages.create 呼び出し（章 24） ─────────
+  - kind: reading
+    title: "Claude API のメッセージ送信（章 24 復習）"
+    prompt: |
+      下のコードについて、`messages` パラメータの構造として正しいものを選んでください。
+    code: |
+      response = client.messages.create(
+          model="claude-sonnet-4-6",
+          max_tokens=200,
+          messages=[{"role": "user", "content": "こんにちは"}],
+      )
+    code_file_label: "q04.py"
+    choices:
+      - "文字列のリスト"
+      - "{role, content} 形式の辞書のリスト"
+      - "単一の文字列"
+      - "{prompt, completion} 形式の辞書"
+    correct_index: 1
+    explanation: |
+      Claude API の `messages` は **`{"role": "user"|"assistant", "content": ...}` の辞書を要素とするリスト**。会話履歴を渡すときも同じ形式で並べます。
