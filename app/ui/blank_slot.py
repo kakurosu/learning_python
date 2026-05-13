@@ -58,13 +58,13 @@ class BlankSlot(QLineEdit):
 
     # ------------------------------------------------------------------
     def _set_state(self, state: str) -> None:
-        # Sharp corners, hairline borders, white background. The accent (red)
-        # is reserved for the active partial-match state to direct attention.
+        # Dark-mode sharp variant: surface bg, hairline border. Accent (red)
+        # is the focus / partial-match cue; emerald = ok, red bg-wash = ng.
         styles = {
-            "neutral": "border: 1px solid #E5E5E5; border-radius:0; padding:2px 6px; background:#FFFFFF; color:#0A0A0A;",
-            "partial": "border: 1.5px solid #DC2626; border-radius:0; padding:2px 6px; background:#FFFFFF; color:#0A0A0A;",
-            "ok":      "border: 1.5px solid #0F766E; border-radius:0; padding:2px 6px; background:#FFFFFF; color:#0A0A0A;",
-            "ng":      "border: 1.5px solid #DC2626; border-radius:0; padding:2px 6px; background:#FEF2F2; color:#0A0A0A;",
+            "neutral": "border: 1px solid #262626; border-radius:0; padding:2px 6px; background:#1C1C1C; color:#F5F5F5;",
+            "partial": "border: 1.5px solid #EF4444; border-radius:0; padding:2px 6px; background:#1C1C1C; color:#F5F5F5;",
+            "ok":      "border: 1.5px solid #10B981; border-radius:0; padding:2px 6px; background:#1C1C1C; color:#F5F5F5;",
+            "ng":      "border: 1.5px solid #EF4444; border-radius:0; padding:2px 6px; background:#2A0E0E; color:#F5F5F5;",
         }
         self.setStyleSheet(styles.get(state, styles["neutral"]))
 

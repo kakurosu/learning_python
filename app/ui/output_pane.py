@@ -43,11 +43,15 @@ class OutputPane(QWidget):
         self._text.setFont(font)
         self._text.setMinimumHeight(80)
         self._text.setPlaceholderText("（実行結果がここに表示されます）")
+        # Terminal-like dark surface, with a thin red top accent the first
+        # time something is rendered (handled in render()) — keeps it readable
+        # on the dark theme and visually distinct from the code block above.
         self._text.setStyleSheet(
             "QPlainTextEdit {"
-            " background: #FFFFFF; color: #3B3B3B;"
-            " border: 1px solid #E5E5E5; border-radius: 0;"
+            " background: #0F0F0F; color: #D4D4D4;"
+            " border: 1px solid #262626; border-radius: 0;"
             " padding: 10px 12px;"
+            " font-family: 'Cascadia Mono', Consolas, monospace;"
             "}"
         )
 
@@ -87,17 +91,17 @@ class OutputPane(QWidget):
         if any_extra:
             self.setMaximumHeight(16777215)  # remove cap from page caller
         if result.stdout:
-            self._append_text(result.stdout, color="#3B3B3B")
+            self._append_text(result.stdout, color="#D4D4D4")
         if result.stderr:
-            self._append_text(_strip_ansi(result.stderr), color="#DC2626")
+            self._append_text(_strip_ansi(result.stderr), color="#F87171")
         if result.traceback:
-            self._append_text("\n".join(_strip_ansi(t) for t in result.traceback), color="#DC2626")
+            self._append_text("\n".join(_strip_ansi(t) for t in result.traceback), color="#F87171")
         if result.error_value and not result.traceback:
-            self._append_text(f"{result.error_name}: {result.error_value}", color="#DC2626")
+            self._append_text(f"{result.error_name}: {result.error_value}", color="#F87171")
         # text/plain (e.g. pandas repr) goes after stdout
         if result.text_plain and not result.html_blobs:
             for tp in result.text_plain:
-                self._append_text(tp, color="#3B3B3B")
+                self._append_text(tp, color="#D4D4D4")
 
         if any_extra:
             for png in result.images_png:

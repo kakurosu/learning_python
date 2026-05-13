@@ -94,7 +94,7 @@ class ReadingPageWidget(QWidget):
         # Choice group: a QButtonGroup wraps a list of QRadioButtons so we
         # can read back the picked index via checkedId().
         choices_box = QFrame(inner)
-        choices_box.setStyleSheet(f"QFrame {{ background: white; border: 1px solid {LINE}; }}")
+        choices_box.setStyleSheet(f"QFrame {{ background: #141414; border: 1px solid {LINE}; }}")
         choices_layout = QVBoxLayout(choices_box)
         choices_layout.setContentsMargins(14, 10, 14, 10)
         choices_layout.setSpacing(6)
@@ -110,7 +110,7 @@ class ReadingPageWidget(QWidget):
             f" spacing: 10px; background: transparent; }}"
             f"QRadioButton:hover {{ color: {ACCENT}; }}"
             f"QRadioButton::indicator {{ width: 16px; height: 16px;"
-            f" border: 2px solid {INK_3}; background: white;"
+            f" border: 2px solid {INK_3}; background: #141414;"
             f" border-radius: 9px; }}"
             f"QRadioButton::indicator:hover {{ border-color: {ACCENT}; }}"
             f"QRadioButton::indicator:checked {{ border: 2px solid {ACCENT};"
@@ -127,7 +127,7 @@ class ReadingPageWidget(QWidget):
         self._notice = QLabel("", inner)
         self._notice.setWordWrap(True)
         self._notice.setStyleSheet(
-            f"QLabel {{ color: {INK}; background: white;"
+            f"QLabel {{ color: {INK}; background: #141414;"
             f" border-left: 3px solid {ACCENT}; padding: 8px 14px; font-size: 12px; }}"
         )
         self._notice.setVisible(False)

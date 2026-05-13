@@ -24,10 +24,13 @@ from ..kernel.manager import KernelSession
 from ..llm.claude_client import ClaudeClient
 from ..resources.theme import (
     ACCENT,
+    BG,
     INK,
     INK_3,
     LINE,
+    LINE_STRONG,
     PHASE_LABELS,
+    SURFACE,
 )
 from .pages.exercise_page import ExercisePageWidget
 from .pages.reading_page import ReadingPageWidget
@@ -67,7 +70,7 @@ class ChapterView(QWidget):
         header.setObjectName("chapterHeader")
         header.setFixedHeight(52)
         header.setStyleSheet(
-            f"#chapterHeader {{ background: white; border-bottom: 1px solid {LINE}; }}"
+            f"#chapterHeader {{ background: #141414; border-bottom: 1px solid {LINE}; }}"
         )
         head_layout = QHBoxLayout(header)
         head_layout.setContentsMargins(32, 0, 32, 0)
@@ -149,13 +152,13 @@ class ChapterView(QWidget):
 
         # Body slot
         self._slot_container = QWidget(self)
-        self._slot_container.setStyleSheet("background: white;")
+        self._slot_container.setStyleSheet("background: #141414;")
         self._slot_layout = QStackedLayout(self._slot_container)
         self._slot_layout.setContentsMargins(0, 0, 0, 0)
 
         # Footer
         self._footer = QFrame(self)
-        self._footer.setStyleSheet(f"QFrame {{ background: white; border-top: 1px solid {LINE}; }}")
+        self._footer.setStyleSheet(f"QFrame {{ background: #141414; border-top: 1px solid {LINE}; }}")
         foot_layout = QHBoxLayout(self._footer)
         foot_layout.setContentsMargins(32, 10, 32, 10)
         # Footer buttons get explicit inline styles. The global QSS gets
@@ -171,17 +174,17 @@ class ChapterView(QWidget):
             "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
             "QPushButton:pressed { background: #991B1B; border-color: #991B1B; }"
             "QPushButton:disabled {"
-            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+            f" background: #141414; color: {LINE}; border-color: {LINE}; }}"
         )
         _secondary_qss = (
             "QPushButton {"
-            f" background: white; color: {INK}; border: 1px solid {INK};"
+            f" background: #141414; color: {INK}; border: 1px solid {INK};"
             " border-radius: 0; padding: 8px 22px; font-size: 11px;"
             " font-weight: 700; min-width: 96px; min-height: 24px;"
             " }"
             f"QPushButton:hover {{ background: {INK}; color: white; }}"
             "QPushButton:disabled {"
-            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+            f" background: #141414; color: {LINE}; border-color: {LINE}; }}"
         )
         self._prev_btn = QPushButton("Back", self._footer)
         self._prev_btn.setStyleSheet(_secondary_qss)

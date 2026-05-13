@@ -219,7 +219,7 @@ class SamplePageWidget(QWidget):
                     hint.setOpenExternalLinks(True)
                     hint.setWordWrap(True)
                     hint.setStyleSheet(
-                        f"QLabel {{ color: {INK}; background: white;"
+                        f"QLabel {{ color: {INK}; background: #141414;"
                         f" border-left: 3px solid {ACCENT}; padding: 8px 12px;"
                         f" font-size: 12px; }}"
                     )

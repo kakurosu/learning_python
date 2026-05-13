@@ -1,9 +1,9 @@
-"""Code viewer + code block widget — VSCode "Light Modern" inspired.
+"""Code viewer + code block widget — VSCode "Dark+" inspired.
 
 The ``CodeView`` is a read-only ``QPlainTextEdit`` with:
 - Cascadia Mono / Consolas font.
 - Line numbers in a left gutter.
-- Syntax highlighting using VSCode Light Modern token colors.
+- Syntax highlighting using VSCode Dark+ token colors.
 - 1-pixel hairline border, no rounded corners.
 
 The ``CodeBlock`` wraps a ``CodeView`` with a sharp header bar (file name
@@ -36,22 +36,22 @@ from PyQt6.QtWidgets import (
 
 # --- VSCode Light Modern token palette --------------------------------------
 
-VSCODE_BG = "#FFFFFF"
-VSCODE_FG = "#3B3B3B"
-VSCODE_GUTTER_BG = "#FFFFFF"
-VSCODE_GUTTER_FG = "#6E7781"
-VSCODE_GUTTER_BORDER = "#E5E5E5"
-VSCODE_SELECTION = "#ADD6FF"
+VSCODE_BG            = "#1E1E1E"
+VSCODE_FG            = "#D4D4D4"
+VSCODE_GUTTER_BG     = "#1E1E1E"
+VSCODE_GUTTER_FG     = "#858585"
+VSCODE_GUTTER_BORDER = "#2D2D2D"
+VSCODE_SELECTION     = "#264F78"
 
-VSCODE_KEYWORD = "#0000FF"
-VSCODE_CONTROL = "#AF00DB"
-VSCODE_STRING = "#A31515"
-VSCODE_NUMBER = "#098658"
-VSCODE_FUNCTION = "#795E26"
-VSCODE_TYPE = "#267F99"
-VSCODE_VARIABLE = "#001080"
-VSCODE_COMMENT = "#008000"
-VSCODE_DECORATOR = "#795E26"
+VSCODE_KEYWORD   = "#569CD6"  # blue
+VSCODE_CONTROL   = "#C586C0"  # purple
+VSCODE_STRING    = "#CE9178"  # warm peach
+VSCODE_NUMBER    = "#B5CEA8"  # mint
+VSCODE_FUNCTION  = "#DCDCAA"  # pale yellow
+VSCODE_TYPE      = "#4EC9B0"  # teal
+VSCODE_VARIABLE  = "#9CDCFE"  # icy blue
+VSCODE_COMMENT   = "#6A9955"  # forest green
+VSCODE_DECORATOR = "#DCDCAA"
 
 
 class _PyHighlighter(QSyntaxHighlighter):
@@ -281,7 +281,7 @@ class CodeBlock(QFrame):
         header.setStyleSheet(
             f"""
             #CodeBlockHeader {{
-                background: #FAFAFA;
+                background: #252526;
                 border: 1px solid {VSCODE_GUTTER_BORDER};
                 border-bottom: none;
             }}
@@ -292,10 +292,16 @@ class CodeBlock(QFrame):
         header_layout.setContentsMargins(12, 0, 6, 0)
         header_layout.setSpacing(8)
 
+        # Small accent dot ahead of the filename — file tab affordance
+        dot = QLabel(header)
+        dot.setFixedSize(6, 6)
+        dot.setStyleSheet("background: #EF4444; border: none;")
+        header_layout.addWidget(dot)
+
         file_lbl = QLabel(file_label, header)
         file_lbl.setStyleSheet(
             "QLabel {"
-            " color: #6E7781;"
+            " color: #CCCCCC;"
             " font-family: 'Cascadia Mono', 'Consolas', monospace;"
             " font-size: 11px;"
             " letter-spacing: 0.3px;"

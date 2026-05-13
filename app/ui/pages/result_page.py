@@ -1,10 +1,16 @@
-"""Result page — sharp monochrome layout."""
+"""Result page — sharp dark layout with motion on reveal."""
 
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import (
+    QEasingCurve,
+    QPropertyAnimation,
+    QTimer,
+    pyqtSignal,
+)
 from PyQt6.QtWidgets import (
     QFrame,
+    QGraphicsOpacityEffect,
     QHBoxLayout,
     QLabel,
     QPushButton,
@@ -23,6 +29,7 @@ from ...resources.theme import (
     LINE,
     SUCCESS,
 )
+from ..animated_button import AnimatedPushButton
 from ..code_view import CodeBlock
 from ..output_pane import OutputPane
 
@@ -86,14 +93,17 @@ class ResultPageWidget(QWidget):
         layout.addWidget(top_rule)
         layout.addSpacing(18)
 
-        # MASSIVE verdict word
+        # MASSIVE verdict word — fades + slides in for drama.
         verdict = QLabel(verdict_text, inner)
         verdict.setStyleSheet(
             f"color: {verdict_color}; background: transparent;"
-            f" font-size: 64px; font-weight: 900; letter-spacing: -2.5px;"
+            f" font-size: 72px; font-weight: 900; letter-spacing: -3px;"
         )
         layout.addWidget(verdict)
         layout.addSpacing(2)
+        self._verdict_label = verdict
+        # Hold animation references so they don't get GC'd before completing.
+        self._anims: list[QPropertyAnimation] = []
 
         # Bottom heavy rule
         bottom_rule = QFrame(inner)
@@ -144,7 +154,7 @@ class ResultPageWidget(QWidget):
             layout.addWidget(self._kicker_label("What failed"))
             details_frame = QFrame(inner)
             details_frame.setStyleSheet(
-                f"QFrame {{ background: white; border: 1px solid {LINE}; }}"
+                f"QFrame {{ background: #141414; border: 1px solid {LINE}; }}"
             )
             dl = QVBoxLayout(details_frame)
             dl.setContentsMargins(14, 10, 14, 10)
@@ -173,46 +183,32 @@ class ResultPageWidget(QWidget):
             self._llm_response = QLabel("", inner)
             self._llm_response.setWordWrap(True)
             self._llm_response.setStyleSheet(
-                f"QLabel {{ color: {INK}; background: white;"
+                f"QLabel {{ color: {INK}; background: #141414;"
                 f" border-left: 3px solid {ACCENT}; padding: 12px 16px; font-size: 13px; }}"
             )
             self._llm_response.setVisible(False)
             layout.addWidget(self._llm_response)
 
-        # Action buttons — explicit inline style so the button is always
-        # visibly filled (the global QSS was getting suppressed when the
-        # ResultPageWidget was instantiated inside a stacked slot, leaving
-        # the button white-on-white).
+        # Action buttons — AnimatedPushButton drives smooth color fades on
+        # hover / press, which the global QSS alone cannot do (QSS state
+        # changes in Qt are instant). Sizing / sharp corners are kept.
         btn_row = QHBoxLayout()
         btn_row.setSpacing(8)
-        primary_qss = (
-            "QPushButton {"
-            f" background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
-            " border-radius: 0; padding: 10px 28px; font-size: 12px;"
-            " font-weight: 700; min-width: 120px; min-height: 28px;"
-            " }"
-            "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
-            "QPushButton:pressed { background: #991B1B; border-color: #991B1B; }"
-            "QPushButton:focus { outline: none; }"
-        )
-        secondary_qss = (
-            "QPushButton {"
-            f" background: white; color: {INK}; border: 1px solid {INK};"
-            " border-radius: 0; padding: 10px 28px; font-size: 12px;"
-            " font-weight: 700; min-width: 120px; min-height: 28px;"
-            " }"
-            f"QPushButton:hover {{ background: {INK}; color: white; }}"
-            "QPushButton:focus { outline: none; }"
-        )
         if result.overall_passed:
-            self._next_btn = QPushButton("Next", inner)
-            self._next_btn.setStyleSheet(primary_qss)
+            self._next_btn = AnimatedPushButton("Next →", inner)
+            self._next_btn.set_palette(
+                base="#EF4444", hover="#F87171", pressed="#DC2626",
+                text="#FFFFFF", border="#EF4444",
+            )
             self._next_btn.setDefault(True)
             self._next_btn.clicked.connect(self.next_requested.emit)
             btn_row.addWidget(self._next_btn)
         else:
-            self._retry_btn = QPushButton("Retry", inner)
-            self._retry_btn.setStyleSheet(secondary_qss)
+            self._retry_btn = AnimatedPushButton("Retry", inner)
+            self._retry_btn.set_palette(
+                base="#141414", hover="#1F1F1F", pressed="#0A0A0A",
+                text="#F5F5F5", border="#404040",
+            )
             self._retry_btn.setDefault(True)
             self._retry_btn.clicked.connect(self.retry_requested.emit)
             btn_row.addWidget(self._retry_btn)
@@ -224,6 +220,38 @@ class ResultPageWidget(QWidget):
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.addWidget(scroll)
+
+        # Kick off the reveal animation after the widget is laid out.
+        QTimer.singleShot(0, self._play_reveal)
+
+    # ------------------------------------------------------------------
+    def _play_reveal(self) -> None:
+        """Fade-in + subtle downward settle on the verdict word."""
+        eff = QGraphicsOpacityEffect(self._verdict_label)
+        eff.setOpacity(0.0)
+        self._verdict_label.setGraphicsEffect(eff)
+
+        # Opacity 0 → 1 over 280ms
+        fade = QPropertyAnimation(eff, b"opacity", self)
+        fade.setDuration(280)
+        fade.setStartValue(0.0)
+        fade.setEndValue(1.0)
+        fade.setEasingCurve(QEasingCurve.Type.OutCubic)
+
+        # Subtle vertical settle via margin animation on the label's geometry.
+        geo = self._verdict_label.geometry()
+        if geo.height() > 0:
+            start = geo.translated(0, -12)
+            slide = QPropertyAnimation(self._verdict_label, b"geometry", self)
+            slide.setDuration(360)
+            slide.setStartValue(start)
+            slide.setEndValue(geo)
+            slide.setEasingCurve(QEasingCurve.Type.OutCubic)
+            slide.start()
+            self._anims.append(slide)
+
+        fade.start()
+        self._anims.append(fade)
 
     def _kicker_label(self, text: str) -> QLabel:
         lbl = QLabel(text, self)

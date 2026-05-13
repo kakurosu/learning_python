@@ -99,7 +99,7 @@ class ExercisePageWidget(QWidget):
         header.setStyleSheet(
             f"""
             #ExerciseCodeHeader {{
-                background: #FAFAFA;
+                background: #252526;
                 border: 1px solid {VSCODE_GUTTER_BORDER};
                 border-bottom: none;
             }}
@@ -111,7 +111,7 @@ class ExercisePageWidget(QWidget):
         file_lbl = QLabel("exercise.py", header)
         file_lbl.setStyleSheet(
             "QLabel {"
-            " color: #6E7781;"
+            " color: #CCCCCC;"
             " font-family: 'Cascadia Mono', 'Consolas', monospace;"
             " font-size: 11px;"
             " letter-spacing: 0;"
@@ -123,7 +123,7 @@ class ExercisePageWidget(QWidget):
 
         code_body = QFrame(code_wrap)
         code_body.setStyleSheet(
-            f"QFrame {{ background: #FFFFFF; border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
+            f"QFrame {{ background: #1E1E1E; border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
         )
         code_layout = QVBoxLayout(code_body)
         code_layout.setContentsMargins(20, 14, 20, 14)
@@ -137,7 +137,7 @@ class ExercisePageWidget(QWidget):
         self._hint_label = QLabel("", inner)
         self._hint_label.setWordWrap(True)
         self._hint_label.setStyleSheet(
-            f"QLabel {{ color: {INK}; background: white;"
+            f"QLabel {{ color: {INK}; background: #141414;"
             f" border-left: 3px solid {ACCENT}; padding: 10px 14px;"
             f" font-size: 12px; }}"
         )

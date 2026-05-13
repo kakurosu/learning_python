@@ -56,7 +56,7 @@ class TestView(QWidget):
 
         # Header
         header = QFrame(self)
-        header.setStyleSheet(f"QFrame {{ background: white; border-bottom: 1px solid {LINE}; }}")
+        header.setStyleSheet(f"QFrame {{ background: #141414; border-bottom: 1px solid {LINE}; }}")
         head_layout = QHBoxLayout(header)
         head_layout.setContentsMargins(24, 14, 24, 14)
         head_layout.setSpacing(20)
@@ -102,7 +102,7 @@ class TestView(QWidget):
         # Footer with Skip / Submit / Next buttons. Skip and Submit are shown
         # before answering; Next replaces them after the answer is graded.
         footer = QFrame(self)
-        footer.setStyleSheet(f"QFrame {{ background: white; border-top: 1px solid {LINE}; }}")
+        footer.setStyleSheet(f"QFrame {{ background: #141414; border-top: 1px solid {LINE}; }}")
         foot_layout = QHBoxLayout(footer)
         foot_layout.setContentsMargins(32, 10, 32, 10)
         foot_layout.setSpacing(8)
@@ -119,17 +119,17 @@ class TestView(QWidget):
             "QPushButton:hover { background: #B91C1C; border-color: #B91C1C; }"
             "QPushButton:pressed { background: #991B1B; border-color: #991B1B; }"
             "QPushButton:disabled {"
-            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+            f" background: #141414; color: {LINE}; border-color: {LINE}; }}"
         )
         _secondary_qss = (
             "QPushButton {"
-            f" background: white; color: {INK}; border: 1px solid {INK};"
+            f" background: #141414; color: {INK}; border: 1px solid {INK};"
             " border-radius: 0; padding: 8px 22px; font-size: 11px;"
             " font-weight: 700; min-width: 96px; min-height: 24px;"
             " }"
             f"QPushButton:hover {{ background: {INK}; color: white; }}"
             "QPushButton:disabled {"
-            f" background: white; color: {LINE}; border-color: {LINE}; }}"
+            f" background: #141414; color: {LINE}; border-color: {LINE}; }}"
         )
 
         self._skip_btn = QPushButton("Skip", footer)
@@ -452,7 +452,7 @@ class TestView(QWidget):
 
         layout.addWidget(self._kicker_label("Breakdown"))
         breakdown = QFrame(inner)
-        breakdown.setStyleSheet(f"QFrame {{ background: white; border: 1px solid {LINE}; }}")
+        breakdown.setStyleSheet(f"QFrame {{ background: #141414; border: 1px solid {LINE}; }}")
         bl = QVBoxLayout(breakdown)
         bl.setContentsMargins(16, 10, 16, 10)
         bl.setSpacing(6)

@@ -28,14 +28,22 @@ from ..db.repo import Repository
 from ..resources.theme import (
     ACCENT,
     ACCENT_SOFT,
+    ACCENT_TINT,
+    BG,
     BG_ALT,
     FONT_MONO,
+    FONT_SANS_DISPLAY,
     INK,
+    INK_2,
     INK_3,
     INK_4,
+    INK_5,
     LINE,
+    LINE_STRONG,
     PHASE_LABELS,
     SUCCESS,
+    SURFACE,
+    SURFACE_ALT,
 )
 
 
@@ -66,7 +74,7 @@ class TopBar(QFrame):
         super().__init__(parent)
         self.setFixedHeight(64)
         self.setStyleSheet(
-            f"QFrame {{ background: white; border: none; border-bottom: 1px solid {LINE}; }}"
+            f"QFrame {{ background: #141414; border: none; border-bottom: 1px solid {LINE}; }}"
         )
         layout = QHBoxLayout(self)
         layout.setContentsMargins(40, 0, 40, 0)
@@ -127,7 +135,7 @@ class ContinueCard(QFrame):
         self.setStyleSheet(
             f"""
             #ContinueCard {{
-                background: white;
+                background: #141414;
                 border: 1px solid {INK};
                 border-left: 6px solid {ACCENT};
             }}
@@ -282,18 +290,19 @@ class StatRow(QFrame):
         lab.setFixedWidth(96)
         layout.addWidget(lab, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        # Mono bar — filled portion in accent, empty portion in light grey.
-        bar_total = 22
+        # Dot bar — Linear / Notion style. Filled dots use accent, empty
+        # dots use a stronger muted color so the contrast holds on dark bg.
+        bar_total = 12
         filled = 0 if total == 0 else int(round((value / total) * bar_total))
         filled = max(0, min(bar_total, filled))
         bar_text = (
-            f'<span style="color:{ACCENT}">{"━" * filled}</span>'
-            f'<span style="color:{LINE}">{"━" * (bar_total - filled)}</span>'
+            f'<span style="color:{ACCENT}">{"●" * filled}</span>'
+            f'<span style="color:{INK_5}">{"○" * (bar_total - filled)}</span>'
         )
         bar = QLabel(bar_text, self)
         bar.setStyleSheet(
-            f"background: transparent; font-size: 13px; font-weight: 700;"
-            f" letter-spacing: 0; font-family: {FONT_MONO};"
+            f"background: transparent; font-size: 14px; font-weight: 700;"
+            f" letter-spacing: 3px; font-family: {FONT_MONO};"
         )
         bar.setTextFormat(Qt.TextFormat.RichText)
         layout.addWidget(bar, 1, Qt.AlignmentFlag.AlignVCenter)
@@ -333,7 +342,7 @@ class ActionRow(QFrame):
         self.setStyleSheet(
             f"""
             #ActionRow {{
-                background: white;
+                background: #141414;
                 border-left: 4px solid transparent;
                 border-bottom: 1px solid {LINE};
             }}
@@ -406,7 +415,7 @@ class ChapterRow(QFrame):
         self.setStyleSheet(
             f"""
             #ChapterRow {{
-                background: white;
+                background: #141414;
                 border-left: 4px solid transparent;
                 border-bottom: 1px solid {LINE};
             }}
@@ -519,16 +528,32 @@ class LauncherScreen(QWidget):
         layout.setContentsMargins(40, 28, 40, 40)
         layout.setSpacing(0)
 
-        # Header band — kicker + title
-        layout.addWidget(_Kicker("DASHBOARD"))
-        layout.addSpacing(6)
+        # Hero band — large display kicker + title + subtitle, Linear/Vercel feel
+        layout.addWidget(_Kicker("Dashboard"))
+        layout.addSpacing(10)
 
-        h = QLabel("学習を再開する。", inner)
+        h = QLabel("Welcome back.", inner)
         h.setStyleSheet(
-            f"color: {INK}; font-size: 26px; font-weight: 800; letter-spacing: -0.4px;"
+            f"color: {INK}; font-size: 44px; font-weight: 800; letter-spacing: -1.4px;"
+            f" font-family: {FONT_SANS_DISPLAY};"
         )
         layout.addWidget(h)
-        layout.addSpacing(24)
+
+        sub = QLabel("学習を再開する。続きから、または新しい章へ。", inner)
+        sub.setStyleSheet(
+            f"color: {INK_3}; font-size: 13px; font-weight: 500; letter-spacing: -0.1px;"
+            f" padding-top: 4px;"
+        )
+        layout.addWidget(sub)
+
+        # Bright red 2px rule pinned to the left
+        rule_hero = QFrame(inner)
+        rule_hero.setStyleSheet(f"background: {ACCENT};")
+        rule_hero.setFixedHeight(2)
+        rule_hero.setMaximumWidth(48)
+        layout.addSpacing(16)
+        layout.addWidget(rule_hero)
+        layout.addSpacing(28)
 
         # Two-column band: continue card (left) + stats column (right)
         progress = self.repo.all_progress(self.user_id)
@@ -623,7 +648,7 @@ class LauncherScreen(QWidget):
 
         header = QFrame(outer)
         header.setFixedHeight(64)
-        header.setStyleSheet(f"QFrame {{ background: white; border-bottom: 1px solid {LINE}; }}")
+        header.setStyleSheet(f"QFrame {{ background: #141414; border-bottom: 1px solid {LINE}; }}")
         head_layout = QHBoxLayout(header)
         head_layout.setContentsMargins(48, 0, 48, 0)
         back = QPushButton("Back", header)

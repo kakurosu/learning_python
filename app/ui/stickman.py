@@ -1,10 +1,11 @@
 """Mascot strip — a permanent inline bar that sits *between* the page
 content and the footer. Never overlaps any interactive UI.
 
-The widget is composed of:
-- a small dog PNG figure (4 moods) on the right; falls back to the legacy
-  stick-figure SVG when the PNG is missing
-- a flat speech text label on the left
+Layout (left → right):
+    [Mentor label] · [dog PNG] · [speech bubble (left-accent + tint bg)]
+
+The dog moved from the right side to the left so the reader's eye flows
+from the mascot into the spoken message (left-to-right reading order).
 """
 
 from __future__ import annotations
@@ -26,9 +27,13 @@ from PyQt6.QtWidgets import (
 
 from ..resources.theme import (
     ACCENT,
+    ACCENT_TINT,
+    BG,
+    FONT_SANS,
     INK,
     INK_3,
     LINE,
+    SURFACE_ALT,
 )
 
 Mood = Literal["normal", "happy", "sad", "explain"]
@@ -43,7 +48,7 @@ _RESOURCE_DIR = Path(__file__).resolve().parent.parent / "resources" / "stickman
 #   happy   → dog4 (laugh)   — celebrate a correct answer
 #   sad     → dog3 (cry)     — wrong answer / runtime error
 #   explain → dog2 (angry)   — focused/serious while explaining
-_MASCOT_PNG_SIZE = (42, 42)
+_MASCOT_PNG_SIZE = (44, 44)
 
 
 class StickmanStrip(QFrame):
@@ -53,7 +58,7 @@ class StickmanStrip(QFrame):
     overlap with any other UI element because it occupies its own row.
     """
 
-    HEIGHT = 60
+    HEIGHT = 68
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -62,7 +67,7 @@ class StickmanStrip(QFrame):
         self.setStyleSheet(
             f"""
             #StickmanStrip {{
-                background: white;
+                background: {BG};
                 border: none;
                 border-top: 1px solid {LINE};
             }}
@@ -70,40 +75,20 @@ class StickmanStrip(QFrame):
         )
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(40, 0, 40, 0)
-        layout.setSpacing(16)
+        layout.setContentsMargins(32, 10, 32, 10)
+        layout.setSpacing(14)
 
-        self._kicker = QLabel("Assistant", self)
-        self._kicker.setStyleSheet(
-            f"color: {ACCENT}; font-size: 11px; font-weight: 700; letter-spacing: 0;"
+        # 1) "Mentor" label on the very left
+        self._mood_lbl = QLabel("Mentor", self)
+        self._mood_lbl.setStyleSheet(
+            f"color: {ACCENT}; font-size: 10px; font-weight: 800; letter-spacing: 0.4px;"
+            f" font-family: 'Cascadia Mono', Consolas, monospace; background: transparent;"
         )
-        self._kicker.setFixedWidth(78)
-        layout.addWidget(self._kicker, 0, Qt.AlignmentFlag.AlignVCenter)
+        self._mood_lbl.setFixedWidth(56)
+        layout.addWidget(self._mood_lbl, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        # Vertical separator
-        sep1 = QFrame(self)
-        sep1.setStyleSheet(f"background: {LINE};")
-        sep1.setFixedSize(1, 24)
-        layout.addWidget(sep1, 0, Qt.AlignmentFlag.AlignVCenter)
-
-        self._speech = QLabel("", self)
-        self._speech.setWordWrap(False)
-        self._speech.setFont(QFont("Segoe UI", 10))
-        self._speech.setStyleSheet(
-            f"color: {INK}; padding: 0; background: transparent; border: none;"
-        )
-        self._speech.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        layout.addWidget(self._speech, 1, Qt.AlignmentFlag.AlignVCenter)
-
-        # Vertical separator
-        sep2 = QFrame(self)
-        sep2.setStyleSheet(f"background: {LINE};")
-        sep2.setFixedSize(1, 24)
-        layout.addWidget(sep2, 0, Qt.AlignmentFlag.AlignVCenter)
-
-        # Mascot figure. We host both a QLabel (for PNG via QPixmap) and a
-        # QSvgWidget (legacy fallback) inside a stacked container, switching
-        # whichever is loaded for the current mood.
+        # 2) Mascot dog (PNG / SVG fallback) — moved to LEFT so the eye flows
+        #    mascot → speech.
         self._mascot_holder = QWidget(self)
         self._mascot_holder.setFixedSize(*_MASCOT_PNG_SIZE)
         mascot_stack = QStackedLayout(self._mascot_holder)
@@ -120,12 +105,40 @@ class StickmanStrip(QFrame):
 
         layout.addWidget(self._mascot_holder, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        self._mood_lbl = QLabel("Mentor", self)
-        self._mood_lbl.setStyleSheet(
-            f"color: {INK_3}; font-size: 11px; font-weight: 700; letter-spacing: 0;"
+        # 3) Speech bubble — distinct surface with a red left bar so it reads
+        #    as "the mascot is speaking", not just a status line.
+        self._bubble = QFrame(self)
+        self._bubble.setObjectName("SpeechBubble")
+        self._bubble.setStyleSheet(
+            f"""
+            #SpeechBubble {{
+                background: {SURFACE_ALT};
+                border: 1px solid {LINE};
+                border-left: 3px solid {ACCENT};
+            }}
+            """
         )
-        self._mood_lbl.setFixedWidth(56)
-        layout.addWidget(self._mood_lbl, 0, Qt.AlignmentFlag.AlignVCenter)
+        bubble_layout = QHBoxLayout(self._bubble)
+        bubble_layout.setContentsMargins(14, 6, 14, 6)
+        bubble_layout.setSpacing(0)
+
+        self._speech = QLabel("", self._bubble)
+        self._speech.setWordWrap(False)
+        self._speech.setFont(QFont("Segoe UI", 10))
+        self._speech.setStyleSheet(
+            f"color: {INK}; padding: 0; background: transparent; border: none;"
+            f" font-family: {FONT_SANS}; font-size: 13px; letter-spacing: -0.1px;"
+        )
+        self._speech.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        bubble_layout.addWidget(self._speech)
+
+        layout.addWidget(self._bubble, 1, Qt.AlignmentFlag.AlignVCenter)
+
+        # 4) Tiny live-status dot on the very right — reads as "online"
+        status = QFrame(self)
+        status.setFixedSize(8, 8)
+        status.setStyleSheet(f"background: {ACCENT}; border: none;")
+        layout.addWidget(status, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self._mood: Mood = "normal"
         self.set_mood("normal")
@@ -145,6 +158,10 @@ class StickmanStrip(QFrame):
                 )
                 self._pix_label.setPixmap(scaled)
                 self._mascot_stack.setCurrentWidget(self._pix_label)
+                # Subtly tint the bubble border when mood is happy/sad so the
+                # speech color matches the mascot's emotion.
+                accent = ACCENT_TINT if mood in ("sad", "explain") else "transparent"
+                _ = accent  # reserved for future hue shifts
                 return
         # PNG missing or unreadable — fall back to the legacy stick-figure SVG.
         svg = _RESOURCE_DIR / f"{mood}.svg"

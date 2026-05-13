@@ -34,7 +34,7 @@ class HistoryView(QWidget):
 
         # Header
         header = QFrame(self)
-        header.setStyleSheet(f"QFrame {{ background: white; border-bottom: 1px solid {LINE}; }}")
+        header.setStyleSheet(f"QFrame {{ background: #141414; border-bottom: 1px solid {LINE}; }}")
         head_layout = QHBoxLayout(header)
         head_layout.setContentsMargins(24, 14, 24, 14)
         back = QPushButton("← ホーム", header)
@@ -109,7 +109,7 @@ class HistoryView(QWidget):
         passed = (r.score / max(r.total, 1)) >= 0.6
         row = QFrame(parent)
         row.setStyleSheet(
-            f"QFrame {{ background: white; border: none; border-bottom: 1px solid {LINE}; }}"
+            f"QFrame {{ background: #141414; border: none; border-bottom: 1px solid {LINE}; }}"
         )
         layout = QHBoxLayout(row)
         layout.setContentsMargins(0, 14, 0, 14)
