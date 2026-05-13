@@ -55,6 +55,14 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
 
+# --- uv -------------------------------------------------------------------
+# uv (https://docs.astral.sh/uv/) is the recommended package / venv manager.
+# Run `uv sync` to create the .venv and install dependencies declared above.
+# Optional extras are exposed via `uv sync --extra dev --extra streamlit ...`.
+[tool.uv]
+package = true
+managed = true
+
 [tool.ruff]
 line-length = 110
 target-version = "py311"

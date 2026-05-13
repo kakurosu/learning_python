@@ -85,6 +85,10 @@ progress.db
 test_progress.db
 .streamlit/secrets.toml
 
+# uv — keep uv.lock in source control for reproducibility, ignore caches.
+.uv/
+# (uv.lock IS tracked — don't add it here.)
+
 # IDE
 # .vscode/
 # .idea/
