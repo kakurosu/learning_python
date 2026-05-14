@@ -36,6 +36,7 @@ from ...resources.theme import (
     INK_3,
 )
 from ..code_view import CodeBlock
+from ..latex_render import render_latex_in_markdown
 from ..output_pane import OutputPane
 
 
@@ -167,7 +168,7 @@ class SamplePageWidget(QWidget):
 
         explanation = QTextBrowser(inner)
         explanation.setOpenExternalLinks(True)
-        explanation.setMarkdown(page.markdown)
+        explanation.setMarkdown(render_latex_in_markdown(page.markdown))
         explanation.setStyleSheet(
             f"QTextBrowser {{ background: transparent; border: none; color: {INK};"
             f" font-size: 13px; }}"

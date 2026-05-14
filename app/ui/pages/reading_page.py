@@ -27,6 +27,7 @@ from ...resources.theme import (
     LINE,
 )
 from ..code_view import CodeBlock
+from ..latex_render import render_latex_in_markdown
 
 
 class ReadingPageWidget(QWidget):
@@ -63,7 +64,7 @@ class ReadingPageWidget(QWidget):
         layout.addWidget(rule)
 
         prompt = QTextBrowser(inner)
-        prompt.setMarkdown(page.prompt)
+        prompt.setMarkdown(render_latex_in_markdown(page.prompt))
         prompt.setStyleSheet(
             f"QTextBrowser {{ background: transparent; border: none; color: {INK};"
             f" font-size: 12px; }}"

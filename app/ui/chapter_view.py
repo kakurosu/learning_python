@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -68,12 +68,15 @@ class ChapterView(QWidget):
         # right-aligned page counter + back button. Sharper, no centered text.
         header = QFrame(self)
         header.setObjectName("chapterHeader")
-        header.setFixedHeight(52)
+        header.setFixedHeight(58)
         header.setStyleSheet(
             f"#chapterHeader {{ background: {BG}; border-bottom: 1px solid {LINE}; }}"
         )
         head_layout = QHBoxLayout(header)
-        head_layout.setContentsMargins(32, 0, 32, 0)
+        # 8px bottom margin gives the page counter breathing room above the
+        # 2px red progress rule — without it the "06" descender visually
+        # touches the rule.
+        head_layout.setContentsMargins(32, 0, 32, 8)
         head_layout.setSpacing(16)
 
         # Wordmark (left)
@@ -131,10 +134,11 @@ class ChapterView(QWidget):
         # Right side: page counter + back
         self._page_count_lbl = QLabel("", header)
         self._page_count_lbl.setStyleSheet(
-            f"color: {INK_3}; font-size: 11px; font-weight: 700; letter-spacing: 0;"
-            f" font-family: 'Cascadia Mono', 'Consolas', monospace;"
+            f"color: {INK_3}; font-size: 11px; font-weight: 700; letter-spacing: 0.4px;"
+            f" font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;"
+            f" padding: 4px 12px 4px 0;"
         )
-        head_layout.addWidget(self._page_count_lbl)
+        head_layout.addWidget(self._page_count_lbl, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self._back_btn = QPushButton("Close", header)
         self._back_btn.setProperty("variant", "secondary")

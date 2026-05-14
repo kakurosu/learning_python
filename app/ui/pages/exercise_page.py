@@ -26,6 +26,7 @@ from ...resources.theme import (
 )
 from ..blank_slot import BlankSlot
 from ..code_view import VSCODE_GUTTER_BORDER
+from ..latex_render import render_latex_in_markdown
 
 _SLOT_RE = re.compile(r"\{\{slot:([^}\s]+)\}\}")
 
@@ -75,7 +76,7 @@ class ExercisePageWidget(QWidget):
         layout.addWidget(rule)
 
         prompt = QTextBrowser(inner)
-        prompt.setMarkdown(page.prompt)
+        prompt.setMarkdown(render_latex_in_markdown(page.prompt))
         prompt.setStyleSheet(
             f"QTextBrowser {{ background: transparent; border: none; color: {INK};"
             f" font-size: 12px; }}"
