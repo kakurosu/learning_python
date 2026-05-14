@@ -228,9 +228,11 @@ class MainWindow(QMainWindow):
             self.history_view = new
 
     def _on_nav(self, slug: str) -> None:
-        # If we're inside a chapter, leaving via sidebar should tear it down.
+        # If we're inside a chapter, leaving via sidebar should tear it down
+        # and bring the TopBar back (it was hidden while the chapter was open).
         if self._chapter_view is not None:
             self._tear_down_chapter()
+            self.shell.topbar.setVisible(True)
         self._navigate_to(slug)
 
     def _on_resume(self) -> None:
@@ -262,13 +264,13 @@ class MainWindow(QMainWindow):
         )
         view.back_to_launcher.connect(self._return_from_chapter)
         # Replace the "chapter" slot in the shell with this ChapterView so the
-        # sidebar / topbar / statusbar stay visible.
+        # sidebar / statusbar stay visible. The TopBar is hidden because the
+        # chapter view's own header already carries Phase / Ch / Title — no
+        # need to repeat it as a breadcrumb above.
         self.shell.replace_view("chapters", view)
         self._chapter_view = view
         self.shell.show_view("chapters")
-        self.shell.topbar.set_breadcrumb(
-            f"Phase {ch.phase}", f"Ch {ch.id:02d}", ch.title,
-        )
+        self.shell.topbar.setVisible(False)
         self.shell.sidebar.set_active("chapters")
         self._refresh_mini_progress(active_chapter=ch, page=start_page_index)
 
@@ -284,6 +286,8 @@ class MainWindow(QMainWindow):
 
     def _return_from_chapter(self) -> None:
         self._tear_down_chapter()
+        # Restore the TopBar that the chapter view had hidden.
+        self.shell.topbar.setVisible(True)
         self._refresh_dashboard()
         self._navigate_to("dashboard")
         self._refresh_mini_progress()
