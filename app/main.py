@@ -1,8 +1,8 @@
 """Application entrypoint.
 
-Wires together the launcher, the chapter view, the kernel session and the SQLite
-repository. The MainWindow swaps between two top-level widgets — Launcher and
-ChapterView — using a QStackedLayout.
+Hosts the Linear-style ``AppShell`` (sidebar + top bar + status bar) and
+swaps Dashboard / Chapter picker / Test / History / ChapterView into the
+content stack on demand.
 """
 
 from __future__ import annotations
@@ -18,21 +18,23 @@ from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
     QMessageBox,
-    QStackedLayout,
-    QStatusBar,
     QWidget,
 )
 
 from .content.loader import ContentError, load_chapters
 from .content.test_schemas import load_test_sets
+from .db.models import ChapterStatus
 from .db.repo import Repository
 from .kernel.manager import KernelSession
 from .llm.claude_client import ClaudeClient
 from .resources.theme import GLOBAL_STYLESHEET
 from .ui.chapter_view import ChapterView
 from .ui.history_view import HistoryView
-from .ui.launcher import LauncherScreen
+from .ui.shell import AppShell
 from .ui.test_view import TestView
+from .ui.views.chapter_picker import ChapterPickerView
+from .ui.views.dashboard import DashboardView
+from .ui.views.placeholder import PlaceholderView
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_DIR = PROJECT_ROOT / "content" / "chapters"
@@ -74,11 +76,16 @@ def _load_bundled_fonts() -> list[str]:
     return loaded
 
 
+# ---------------------------------------------------------------------------
+# Main window
+# ---------------------------------------------------------------------------
+
+
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Study Python Finance")
-        self.setMinimumSize(1100, 760)
+        self.setMinimumSize(1200, 780)
 
         # Best-effort: load .env so ANTHROPIC_API_KEY is picked up if user set it.
         try:
@@ -114,30 +121,80 @@ class MainWindow(QMainWindow):
                 f"{CONTENT_DIR} に章ファイル(YAML)が見つかりません。",
             )
 
-        # Central stacked widget
-        central = QWidget(self)
-        self._stack = QStackedLayout(central)
-        self.setCentralWidget(central)
+        # ----- Build the shell -----
+        self.shell = AppShell(self)
+        self.setCentralWidget(self.shell)
 
-        self.launcher = LauncherScreen(self.chapters, self.repo, self.user.id, self)
-        self.launcher.chapter_selected.connect(self._open_chapter)
-        self.launcher.test_requested.connect(self._open_test)
-        self.launcher.history_requested.connect(self._open_history)
-        self._stack.addWidget(self.launcher)
+        # Register sidebar nav items (icons are simple text glyphs)
+        self.shell.sidebar.add_item("dashboard", "ダッシュボード", icon="▣", group="学習")
+        self.shell.sidebar.add_item("chapters",   "章を学ぶ",      icon="□", group="学習",
+                                     badge=str(len(self.chapters)))
+        self.shell.sidebar.add_item("practice",   "練習問題",       icon="◇", group="学習")
+        self.shell.sidebar.add_item("tests",      "実力テスト",     icon="✓", group="学習")
+        self.shell.sidebar.add_item("history",    "学習履歴",       icon="≡", group="学習")
+        self.shell.sidebar.add_item("references", "リファレンス",   icon="✎", group="補助")
+        self.shell.sidebar.add_item("settings",   "設定",           icon="⚙", group="補助")
+        self.shell.sidebar.add_stretch()
+        self.shell.sidebar.activated.connect(self._on_nav)
 
+        # Build views
+        self.dashboard = DashboardView(self.chapters, self.repo, self.user.id)
+        self.dashboard.resume_requested.connect(self._on_resume)
+        self.dashboard.browse_chapters_requested.connect(
+            lambda: self._navigate_to("chapters")
+        )
+        self.dashboard.test_requested.connect(self._open_test)
+        self.dashboard.history_requested.connect(lambda: self._navigate_to("history"))
+        self.shell.add_view("dashboard", self.dashboard)
+
+        self.picker = ChapterPickerView(self.chapters, self.repo, self.user.id)
+        self.picker.chapter_selected.connect(self._open_chapter)
+        self.shell.add_view("chapters", self.picker)
+
+        self.shell.add_view(
+            "practice",
+            PlaceholderView("練習問題", "Phase 横断の総合練習をまとめた画面。"),
+        )
+
+        # Tests entry view is also a placeholder list (legacy LauncherScreen
+        # had no dedicated picker UI yet) — wrap the test set picker as a
+        # minimal placeholder for now.
+        tests_view = _TestPickerStub(
+            list(self.test_sets.values()),
+            on_pick=self._open_test,
+        )
+        self.shell.add_view("tests", tests_view)
+
+        self.history_view = HistoryView(self.repo, self.user.id)
+        self.history_view.back_to_launcher.connect(
+            lambda: self._navigate_to("dashboard")
+        )
+        self.shell.add_view("history", self.history_view)
+
+        self.shell.add_view(
+            "references",
+            PlaceholderView("リファレンス", "標準ライブラリと主要パッケージの早見表。"),
+        )
+        self.shell.add_view(
+            "settings",
+            PlaceholderView("設定", "テーマ・ショートカット・API キーなどを変更できます。"),
+        )
+
+        # Chapter view is created on demand
         self._chapter_view: ChapterView | None = None
         self._test_view: TestView | None = None
-        self._history_view: HistoryView | None = None
 
-        # Status bar — kernel state indicator
-        sb = QStatusBar(self)
-        self.setStatusBar(sb)
-        sb.showMessage("カーネルを起動中...")
+        # Default to dashboard
+        self.shell.show_view("dashboard")
+        self.shell.topbar.set_breadcrumb("study.py", "Dashboard")
+
+        # Update sidebar mini progress card
+        self._refresh_mini_progress()
 
         # Start kernel asynchronously-ish (blocking but quick).
         try:
             self.kernel.start()
-            sb.showMessage("カーネル: ready")
+            self.shell.statusbar.set_kernel_state("ready")
         except Exception as e:  # noqa: BLE001
             logging.exception("kernel start failed")
             QMessageBox.critical(
@@ -145,17 +202,58 @@ class MainWindow(QMainWindow):
                 "カーネル起動エラー",
                 f"Jupyter kernel を起動できませんでした:\n{e}",
             )
-            sb.showMessage("カーネル: 起動に失敗")
+            self.shell.statusbar.set_kernel_state("error", str(e)[:40])
 
     # ------------------------------------------------------------------
+    def _navigate_to(self, slug: str) -> None:
+        """Switch sidebar to ``slug`` and refresh breadcrumb."""
+        crumbs = {
+            "dashboard":  ("study.py", "Dashboard"),
+            "chapters":   ("study.py", "Chapters"),
+            "practice":   ("study.py", "Practice"),
+            "tests":      ("study.py", "Tests"),
+            "history":    ("study.py", "History"),
+            "references": ("study.py", "References"),
+            "settings":   ("study.py", "Settings"),
+        }
+        self.shell.show_view(slug)
+        self.shell.topbar.set_breadcrumb(*crumbs.get(slug, ("study.py",)))
+        if slug == "chapters":
+            self.picker.refresh()
+        if slug == "history":
+            # Rebuild so the latest test scores appear.
+            # HistoryView is cheap; replace in place.
+            new = HistoryView(self.repo, self.user.id)
+            new.back_to_launcher.connect(lambda: self._navigate_to("dashboard"))
+            self.shell.replace_view("history", new)
+            self.history_view = new
+
+    def _on_nav(self, slug: str) -> None:
+        # If we're inside a chapter, leaving via sidebar should tear it down.
+        if self._chapter_view is not None:
+            self._tear_down_chapter()
+        self._navigate_to(slug)
+
+    def _on_resume(self) -> None:
+        prog = self.repo.latest_in_progress(self.user.id)
+        if prog is None:
+            done = {p.chapter_id for p in self.repo.all_progress(self.user.id)
+                    if p.status == ChapterStatus.completed}
+            for ch in self.chapters:
+                if ch.id not in done:
+                    self._open_chapter(ch.id, 0)
+                    return
+            QMessageBox.information(self, "つづきから", "全章クリア済みです。")
+            return
+        self._open_chapter(prog.chapter_id, prog.last_page_index)
+
     def _open_chapter(self, chapter_id: int, start_page_index: int) -> None:
         ch = next((c for c in self.chapters if c.id == chapter_id), None)
         if ch is None:
             QMessageBox.warning(self, "章が見つかりません", f"chapter id={chapter_id}")
             return
-        # Restart the kernel so each chapter starts with a clean namespace.
         self.kernel.restart()
-        self._chapter_view = ChapterView(
+        view = ChapterView(
             ch,
             self.repo,
             self.user.id,
@@ -163,9 +261,33 @@ class MainWindow(QMainWindow):
             start_page_index=start_page_index,
             llm=self.llm,
         )
-        self._chapter_view.back_to_launcher.connect(self._return_to_launcher)
-        self._stack.addWidget(self._chapter_view)
-        self._stack.setCurrentWidget(self._chapter_view)
+        view.back_to_launcher.connect(self._return_from_chapter)
+        # Replace the "chapter" slot in the shell with this ChapterView so the
+        # sidebar / topbar / statusbar stay visible.
+        self.shell.replace_view("chapters", view)
+        self._chapter_view = view
+        self.shell.show_view("chapters")
+        self.shell.topbar.set_breadcrumb(
+            "study.py", f"Phase {ch.phase}", f"Ch {ch.id:02d}", ch.title,
+        )
+        self.shell.sidebar.set_active("chapters")
+        self._refresh_mini_progress(active_chapter=ch, page=start_page_index)
+
+    def _tear_down_chapter(self) -> None:
+        if self._chapter_view is None:
+            return
+        # Restore the chapter-picker view in the slot
+        new_picker = ChapterPickerView(self.chapters, self.repo, self.user.id)
+        new_picker.chapter_selected.connect(self._open_chapter)
+        self.shell.replace_view("chapters", new_picker)
+        self.picker = new_picker
+        self._chapter_view = None
+
+    def _return_from_chapter(self) -> None:
+        self._tear_down_chapter()
+        self._refresh_dashboard()
+        self._navigate_to("dashboard")
+        self._refresh_mini_progress()
 
     def _open_test(self, test_id: str) -> None:
         ts = self.test_sets.get(test_id)
@@ -177,26 +299,47 @@ class MainWindow(QMainWindow):
             )
             return
         self.kernel.restart()
-        self._test_view = TestView(ts, self.repo, self.user.id, self.kernel)
-        self._test_view.back_to_launcher.connect(self._return_to_launcher)
-        self._stack.addWidget(self._test_view)
-        self._stack.setCurrentWidget(self._test_view)
+        view = TestView(ts, self.repo, self.user.id, self.kernel)
+        view.back_to_launcher.connect(lambda: self._navigate_to("dashboard"))
+        self.shell.replace_view("tests", view)
+        self._test_view = view
+        self.shell.show_view("tests")
+        self.shell.topbar.set_breadcrumb("study.py", "Tests", ts.title)
+        self.shell.sidebar.set_active("tests")
 
-    def _open_history(self) -> None:
-        self._history_view = HistoryView(self.repo, self.user.id)
-        self._history_view.back_to_launcher.connect(self._return_to_launcher)
-        self._stack.addWidget(self._history_view)
-        self._stack.setCurrentWidget(self._history_view)
+    # ------------------------------------------------------------------
+    def _refresh_dashboard(self) -> None:
+        """Rebuild dashboard so progress / stats reflect the latest DB state."""
+        new = DashboardView(self.chapters, self.repo, self.user.id)
+        new.resume_requested.connect(self._on_resume)
+        new.browse_chapters_requested.connect(lambda: self._navigate_to("chapters"))
+        new.test_requested.connect(self._open_test)
+        new.history_requested.connect(lambda: self._navigate_to("history"))
+        self.shell.replace_view("dashboard", new)
+        self.dashboard = new
 
-    def _return_to_launcher(self) -> None:
-        for attr in ("_chapter_view", "_test_view", "_history_view"):
-            v = getattr(self, attr, None)
-            if v is not None:
-                self._stack.removeWidget(v)
-                v.deleteLater()
-                setattr(self, attr, None)
-        self.launcher.refresh()
-        self._stack.setCurrentWidget(self.launcher)
+    def _refresh_mini_progress(self, *, active_chapter=None, page: int | None = None) -> None:
+        # Compute Phase A progress as the default mini bar
+        all_progress = self.repo.all_progress(self.user.id)
+        completed_ids = {p.chapter_id for p in all_progress if p.status == ChapterStatus.completed}
+        phase = "A"
+        if active_chapter is not None:
+            phase = active_chapter.phase
+        chs = [c for c in self.chapters if c.phase == phase]
+        total = max(len(chs), 1)
+        done = sum(1 for c in chs if c.id in completed_ids)
+        pct = int(done / total * 100)
+        label = f"Phase {phase} の進捗"
+        if active_chapter is not None and page is not None:
+            chap = f"Ch {active_chapter.id:02d} · p{page + 1}/{len(active_chapter.pages)}"
+        else:
+            latest = self.repo.latest_in_progress(self.user.id)
+            if latest is not None:
+                c = next((c for c in self.chapters if c.id == latest.chapter_id), None)
+                chap = f"Ch {c.id:02d} 「{c.title[:14]}」" if c else "—"
+            else:
+                chap = "新しい章から始めよう"
+        self.shell.sidebar.set_mini_progress(label, pct, chap)
 
     def closeEvent(self, e) -> None:  # noqa: N802
         try:
@@ -211,6 +354,102 @@ class MainWindow(QMainWindow):
         except Exception:  # noqa: BLE001
             logging.exception("streamlit shutdown failed")
         super().closeEvent(e)
+
+
+# ---------------------------------------------------------------------------
+# Lightweight test picker placeholder (real picker is the legacy LauncherScreen)
+# ---------------------------------------------------------------------------
+
+
+class _TestPickerStub(QWidget):
+    """Minimal Tests sidebar view — a list of available test sets."""
+
+    def __init__(self, test_sets, on_pick, parent=None):
+        from PyQt6.QtWidgets import QFrame, QLabel, QPushButton, QScrollArea, QVBoxLayout
+        from .resources.theme import (
+            ACCENT, FONT_MONO, FONT_SANS_DISPLAY, INK, INK_3, INK_4, LINE, SURFACE,
+        )
+        super().__init__(parent)
+        self._on_pick = on_pick
+
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        inner = QWidget()
+        l = QVBoxLayout(inner)
+        l.setContentsMargins(40, 28, 40, 40)
+        l.setSpacing(0)
+
+        kicker = QLabel("Tests", inner)
+        kicker.setStyleSheet(
+            f"color: {ACCENT}; font-size: 10px; font-weight: 800;"
+            f" letter-spacing: 0.6px; font-family: {FONT_MONO};"
+        )
+        l.addWidget(kicker)
+        l.addSpacing(6)
+        t = QLabel("実力テスト", inner)
+        t.setStyleSheet(
+            f"color: {INK}; font-size: 32px; font-weight: 800; letter-spacing: -1px;"
+            f" font-family: {FONT_SANS_DISPLAY};"
+        )
+        l.addWidget(t)
+        sub = QLabel("Phase ごとに 10 問。制限時間 30 分、合格基準 60%。", inner)
+        sub.setStyleSheet(f"color: {INK_3}; font-size: 13px; letter-spacing: -0.1px;")
+        l.addWidget(sub)
+        l.addSpacing(20)
+
+        if not test_sets:
+            empty = QLabel("実力テストはまだ用意されていません。", inner)
+            empty.setStyleSheet(f"color: {INK_4}; font-size: 12px;")
+            l.addWidget(empty)
+        for ts in test_sets:
+            card = QFrame(inner)
+            card.setObjectName("TestCard")
+            card.setStyleSheet(
+                f"""
+                #TestCard {{ background: {SURFACE}; border: 1px solid {LINE};
+                    border-left: 2px solid transparent; border-radius: 0; }}
+                #TestCard:hover {{ border-left-color: {ACCENT}; }}
+                """
+            )
+            cl = QVBoxLayout(card)
+            cl.setContentsMargins(20, 16, 20, 16)
+            row = QFrame(card)
+            rl = QVBoxLayout(row)
+            rl.setContentsMargins(0, 0, 0, 0)
+            ttl = QLabel(ts.title, row)
+            ttl.setStyleSheet(
+                f"color: {INK}; font-size: 16px; font-weight: 700; letter-spacing: -0.2px;"
+            )
+            rl.addWidget(ttl)
+            meta = QLabel(
+                f"Phase {ts.phase} · {len(ts.questions)} 問 · {ts.time_limit_minutes} 分", row,
+            )
+            meta.setStyleSheet(
+                f"color: {INK_4}; font-size: 11px; font-weight: 700;"
+                f" font-family: {FONT_MONO}; letter-spacing: 0.3px;"
+            )
+            rl.addWidget(meta)
+            cl.addWidget(row)
+            start = QPushButton("テストを開始 →", card)
+            start.setCursor(Qt.CursorShape.PointingHandCursor)
+            start.setStyleSheet(
+                f"QPushButton {{ background: {ACCENT}; color: white; border: 1px solid {ACCENT};"
+                f" border-radius: 0; padding: 7px 18px; font-size: 11px; font-weight: 700;"
+                f" min-width: 0; min-height: 0; }}"
+                f"QPushButton:hover {{ background: #F87171; border-color: #F87171; }}"
+            )
+            start.clicked.connect(lambda _checked=False, tid=ts.id: self._on_pick(tid))
+            cl.addWidget(start, 0, Qt.AlignmentFlag.AlignLeft)
+            l.addWidget(card)
+            l.addSpacing(10)
+        l.addStretch(1)
+        scroll.setWidget(inner)
+        outer.addWidget(scroll)
 
 
 def main() -> int:

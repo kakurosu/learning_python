@@ -64,9 +64,9 @@ def render_latex_in_markdown(
     md: str,
     *,
     color: str = "#F5F5F5",
-    fontsize_display: int = 14,
-    fontsize_inline: int = 11,
-    dpi: int = 220,
+    fontsize_display: int = 11,
+    fontsize_inline: int = 9,
+    dpi: int = 160,
 ) -> str:
     """Return ``md`` with $$ … $$ and $ … $ replaced by base64-image syntax.
 
