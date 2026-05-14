@@ -50,16 +50,21 @@ DANGER  = ACCENT
 # Fonts
 # ---------------------------------------------------------------------------
 
+# Font stacks. The first families are loaded from app/resources/fonts/ if
+# the user has placed the corresponding .ttf there (see fonts/README.md);
+# otherwise the OS defaults kick in transparently.
 FONT_SANS = (
-    '"Inter", "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", '
-    '"Yu Gothic UI", "Hiragino Sans", system-ui, -apple-system, sans-serif'
+    '"Inter Variable", "Inter", "Geist", "SF Pro Text", '
+    '"Segoe UI Variable Text", "Segoe UI", "Yu Gothic UI", "Hiragino Sans", '
+    'system-ui, -apple-system, sans-serif'
 )
 FONT_SANS_DISPLAY = (
-    '"Inter Display", "Inter", "SF Pro Display", "Segoe UI Variable Display", '
-    '"Segoe UI", "Yu Gothic UI", "Hiragino Sans", system-ui, sans-serif'
+    '"Inter Display", "Inter Variable", "Inter", "Geist", '
+    '"SF Pro Display", "Segoe UI Variable Display", "Segoe UI", '
+    '"Yu Gothic UI", "Hiragino Sans", system-ui, sans-serif'
 )
 FONT_MONO = (
-    '"Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Consolas", '
+    '"JetBrains Mono", "Cascadia Code", "Cascadia Mono", "Consolas", '
     '"SF Mono", "Menlo", monospace'
 )
 
@@ -87,6 +92,19 @@ QMainWindow, QWidget {{
     color: {INK};
     font-family: {FONT_SANS};
     font-size: 13px;
+}}
+
+QLabel {{
+    color: {INK};
+    letter-spacing: -0.1px;
+}}
+
+QLabel[role="muted"] {{ color: {INK_3}; }}
+QLabel[role="caption"] {{
+    color: {INK_3};
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    text-transform: none;
 }}
 
 /* Buttons --------------------------------------------------------------- */

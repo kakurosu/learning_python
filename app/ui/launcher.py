@@ -74,7 +74,7 @@ class TopBar(QFrame):
         super().__init__(parent)
         self.setFixedHeight(64)
         self.setStyleSheet(
-            f"QFrame {{ background: #141414; border: none; border-bottom: 1px solid {LINE}; }}"
+            f"QFrame {{ background: {BG}; border: none; border-bottom: 1px solid {LINE}; }}"
         )
         layout = QHBoxLayout(self)
         layout.setContentsMargins(40, 0, 40, 0)
@@ -648,7 +648,7 @@ class LauncherScreen(QWidget):
 
         header = QFrame(outer)
         header.setFixedHeight(64)
-        header.setStyleSheet(f"QFrame {{ background: #141414; border-bottom: 1px solid {LINE}; }}")
+        header.setStyleSheet(f"QFrame {{ background: {BG}; border-bottom: 1px solid {LINE}; }}")
         head_layout = QHBoxLayout(header)
         head_layout.setContentsMargins(48, 0, 48, 0)
         back = QPushButton("Back", header)

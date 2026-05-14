@@ -64,6 +64,7 @@ class StickmanStrip(QFrame):
         super().__init__(parent)
         self.setFixedHeight(self.HEIGHT)
         self.setObjectName("StickmanStrip")
+        # Same BG as the body — only the hairline top border marks this row.
         self.setStyleSheet(
             f"""
             #StickmanStrip {{
@@ -73,6 +74,8 @@ class StickmanStrip(QFrame):
             }}
             """
         )
+        # The bubble has its own SURFACE_ALT background so the speech reads
+        # as a distinct "container" while the strip itself stays flat.
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(32, 10, 32, 10)

@@ -70,7 +70,7 @@ class ChapterView(QWidget):
         header.setObjectName("chapterHeader")
         header.setFixedHeight(52)
         header.setStyleSheet(
-            f"#chapterHeader {{ background: #141414; border-bottom: 1px solid {LINE}; }}"
+            f"#chapterHeader {{ background: {BG}; border-bottom: 1px solid {LINE}; }}"
         )
         head_layout = QHBoxLayout(header)
         head_layout.setContentsMargins(32, 0, 32, 0)
@@ -150,15 +150,16 @@ class ChapterView(QWidget):
         self._progress.setTextVisible(False)
         self._progress.setFixedHeight(2)
 
-        # Body slot
+        # Body slot — flat BG so the page content sits on the same surface
+        # as the header/footer; only hairlines demarcate regions (Linear style).
         self._slot_container = QWidget(self)
-        self._slot_container.setStyleSheet("background: #141414;")
+        self._slot_container.setStyleSheet(f"background: {BG};")
         self._slot_layout = QStackedLayout(self._slot_container)
         self._slot_layout.setContentsMargins(0, 0, 0, 0)
 
         # Footer
         self._footer = QFrame(self)
-        self._footer.setStyleSheet(f"QFrame {{ background: #141414; border-top: 1px solid {LINE}; }}")
+        self._footer.setStyleSheet(f"QFrame {{ background: {BG}; border-top: 1px solid {LINE}; }}")
         foot_layout = QHBoxLayout(self._footer)
         foot_layout.setContentsMargins(32, 10, 32, 10)
         # Footer buttons get explicit inline styles. The global QSS gets

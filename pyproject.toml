@@ -10,6 +10,9 @@ authors = [{ name = "skokh" }]
 dependencies = [
     # UI
     "PyQt6>=6.6",
+    # Modern icon set (Font Awesome / Material / Codicons via Qt). Used for
+    # the primary action buttons so the dark UI reads more like a modern IDE.
+    "QtAwesome>=1.3",
     # Jupyter kernel backend
     "jupyter_client>=8.6",
     "ipykernel>=6.29",

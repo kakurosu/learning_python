@@ -313,7 +313,14 @@ class CodeBlock(QFrame):
         if runnable:
             self._run_btn = QPushButton("Run", header)
             self._run_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            self._run_btn.setMinimumWidth(72)
+            self._run_btn.setMinimumWidth(86)
+            # Prepend a play icon — QtAwesome falls back gracefully when not
+            # installed, in which case the button stays text-only.
+            try:
+                import qtawesome as qta
+                self._run_btn.setIcon(qta.icon("fa5s.play", color="white"))
+            except ImportError:
+                pass
             self._run_btn.setStyleSheet(
                 """
                 QPushButton {

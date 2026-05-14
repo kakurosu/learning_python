@@ -13,7 +13,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QGuiApplication
+from PyQt6.QtGui import QFontDatabase, QGuiApplication
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -47,6 +47,31 @@ def _configure_logging() -> None:
     fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     handler.setFormatter(fmt)
     logging.basicConfig(level=logging.INFO, handlers=[handler])
+
+
+def _load_bundled_fonts() -> list[str]:
+    """Register all .ttf / .otf files under app/resources/fonts/ with Qt.
+
+    Returns the list of families that were successfully loaded. The QSS in
+    ``theme.py`` references these families by name (Inter, JetBrains Mono,
+    etc.); when the font isn't bundled the stack silently falls back to the
+    OS default — no error.
+    """
+    fonts_dir = PROJECT_ROOT / "app" / "resources" / "fonts"
+    if not fonts_dir.exists():
+        return []
+    loaded: list[str] = []
+    for path in fonts_dir.iterdir():
+        if path.suffix.lower() not in (".ttf", ".otf"):
+            continue
+        font_id = QFontDatabase.addApplicationFont(str(path))
+        if font_id < 0:
+            logging.warning("could not load font: %s", path.name)
+            continue
+        families = QFontDatabase.applicationFontFamilies(font_id)
+        loaded.extend(families)
+        logging.info("loaded font %s → %s", path.name, families)
+    return loaded
 
 
 class MainWindow(QMainWindow):
@@ -194,6 +219,11 @@ def main() -> int:
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
     app = QApplication(sys.argv)
+    # Load any bundled fonts (Inter / Geist / JetBrains Mono / Noto Sans JP)
+    # before the stylesheet is applied so QSS font-family lookups resolve.
+    families = _load_bundled_fonts()
+    if families:
+        logging.info("bundled fonts active: %s", ", ".join(families))
     app.setStyleSheet(GLOBAL_STYLESHEET)
     win = MainWindow()
     win.show()
