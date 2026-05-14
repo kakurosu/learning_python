@@ -127,8 +127,7 @@ class MainWindow(QMainWindow):
 
         # Register sidebar nav items (icons are simple text glyphs)
         self.shell.sidebar.add_item("dashboard", "ダッシュボード", icon="▣", group="学習")
-        self.shell.sidebar.add_item("chapters",   "章を学ぶ",      icon="□", group="学習",
-                                     badge=str(len(self.chapters)))
+        self.shell.sidebar.add_item("chapters",   "章を学ぶ",      icon="□", group="学習")
         self.shell.sidebar.add_item("practice",   "練習問題",       icon="◇", group="学習")
         self.shell.sidebar.add_item("tests",      "実力テスト",     icon="✓", group="学習")
         self.shell.sidebar.add_item("history",    "学習履歴",       icon="≡", group="学習")
@@ -411,7 +410,7 @@ class _TestPickerStub(QWidget):
             card.setObjectName("TestCard")
             card.setStyleSheet(
                 f"""
-                #TestCard {{ background: {SURFACE}; border: 1px solid {LINE};
+                #TestCard {{ background: transparent; border: 1px solid {LINE};
                     border-left: 2px solid transparent; border-radius: 0; }}
                 #TestCard:hover {{ border-left-color: {ACCENT}; }}
                 """

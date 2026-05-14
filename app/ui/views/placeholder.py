@@ -57,7 +57,7 @@ class PlaceholderView(QWidget):
 
         card = QFrame(self)
         card.setStyleSheet(
-            f"QFrame {{ background: {SURFACE}; border: 1px solid {LINE};"
+            f"QFrame {{ background: transparent; border: 1px solid {LINE};"
             f" border-radius: 0; }}"
         )
         card_l = QVBoxLayout(card)

@@ -69,14 +69,19 @@ PHASE_INFO: list[tuple[str, str, str]] = [
 
 
 class _Section(QFrame):
-    """Card-styled container with a kicker + thin top rule."""
+    """Outlined container with a kicker + thin top rule.
+
+    Background is intentionally transparent (no elevation tier) — the only
+    visual demarcation is the hairline border, matching the Linear "flat
+    surfaces, sharp borders" pattern.
+    """
 
     def __init__(self, kicker: str, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setObjectName("DashSection")
         self.setStyleSheet(
             f"""
-            #DashSection {{ background: {SURFACE}; border: 1px solid {LINE};
+            #DashSection {{ background: transparent; border: 1px solid {LINE};
                 border-radius: 0; }}
             """
         )
@@ -132,7 +137,7 @@ class _PhaseProgressRow(QFrame):
         badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
         badge.setFixedSize(26, 26)
         badge.setStyleSheet(
-            f"background: {SURFACE_ALT}; color: {INK}; border: 1px solid {LINE};"
+            f"background: transparent; color: {INK}; border: 1px solid {LINE};"
             f" font-size: 12px; font-weight: 800; font-family: {FONT_MONO};"
         )
         layout.addWidget(badge, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -188,7 +193,7 @@ class _StatBox(QFrame):
         super().__init__(parent)
         self.setStyleSheet(
             f"""
-            QFrame {{ background: {SURFACE_ALT}; border: 1px solid {LINE};
+            QFrame {{ background: transparent; border: 1px solid {LINE};
                 border-radius: 0; }}
             """
         )
@@ -232,7 +237,7 @@ class _ContinueCard(QFrame):
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setStyleSheet(
             f"""
-            #ContinueCardV2 {{ background: {SURFACE}; border: 1px solid {LINE};
+            #ContinueCardV2 {{ background: transparent; border: 1px solid {LINE};
                 border-radius: 0; }}
             #ContinueCardV2:hover {{ border-color: {ACCENT}; }}
             """
@@ -304,14 +309,6 @@ class _ContinueCard(QFrame):
         )
         resume.clicked.connect(self.clicked.emit)
         btn_row.addWidget(resume)
-
-        kbd = QLabel("⏎", self)
-        kbd.setStyleSheet(
-            f"color: {INK_4}; background: {SURFACE_ALT}; border: 1px solid {LINE};"
-            f" padding: 2px 8px; font-size: 10px; font-weight: 800;"
-            f" font-family: {FONT_MONO};"
-        )
-        btn_row.addWidget(kbd)
 
         list_link = QLabel("章のリストへ", self)
         list_link.setStyleSheet(
@@ -413,30 +410,6 @@ class DashboardView(QWidget):
         sub.setStyleSheet(f"color: {INK_3}; font-size: 13px; letter-spacing: -0.1px;")
         hero_col.addWidget(sub)
         hero_row.addLayout(hero_col, 1)
-
-        # Right side: 今日の学習 / 累計 XP (stub values)
-        stats_row = QHBoxLayout()
-        stats_row.setSpacing(28)
-        for label, value, unit in [("今日の学習", "24", "分"), ("累計 XP", "1,240", "")]:
-            col = QVBoxLayout()
-            col.setSpacing(2)
-            v_text = (
-                f"<span style='color:{INK}; font-size:22px; font-weight:800; "
-                f"letter-spacing:-0.6px;'>{value}</span>"
-                f"<span style='color:{INK_3}; font-size:12px; font-weight:700;'>"
-                f"&nbsp;{unit}</span>"
-            )
-            v_lbl = QLabel(v_text, inner)
-            v_lbl.setTextFormat(Qt.TextFormat.RichText)
-            v_lbl.setStyleSheet(f"font-family: {FONT_SANS_DISPLAY};")
-            col.addWidget(v_lbl)
-            l = QLabel(label, inner)
-            l.setStyleSheet(
-                f"color: {INK_4}; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;"
-            )
-            col.addWidget(l)
-            stats_row.addLayout(col)
-        hero_row.addLayout(stats_row, 0)
         layout.addLayout(hero_row)
         layout.addSpacing(24)
 
@@ -582,7 +555,7 @@ class _QuickActionRow(QFrame):
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
         ic.setFixedSize(28, 28)
         ic.setStyleSheet(
-            f"color: {INK_2}; background: {SURFACE_ALT}; border: 1px solid {LINE};"
+            f"color: {INK_2}; background: transparent; border: 1px solid {LINE};"
             f" font-size: 13px; font-weight: 700;"
         )
         layout.addWidget(ic, 0, Qt.AlignmentFlag.AlignVCenter)

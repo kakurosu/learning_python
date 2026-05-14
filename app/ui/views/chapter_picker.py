@@ -198,7 +198,7 @@ class _PhaseHeader(QFrame):
         letter.setAlignment(Qt.AlignmentFlag.AlignCenter)
         letter.setFixedSize(54, 54)
         letter.setStyleSheet(
-            f"color: {INK}; background: {SURFACE}; border: 1px solid {LINE};"
+            f"color: {INK}; background: transparent; border: 1px solid {LINE};"
             f" font-size: 28px; font-weight: 800; letter-spacing: -1px;"
             f" font-family: {FONT_SANS_DISPLAY};"
         )
@@ -321,21 +321,13 @@ class ChapterPickerView(QWidget):
         self._search_box.setPlaceholderText("章名・トピックを検索")
         self._search_box.setFixedWidth(280)
         self._search_box.setStyleSheet(
-            f"QLineEdit {{ background: {SURFACE}; color: {INK_2};"
+            f"QLineEdit {{ background: transparent; color: {INK_2};"
             f" border: 1px solid {LINE}; border-radius: 0; padding: 7px 12px;"
             f" font-size: 12px; }}"
             f"QLineEdit:focus {{ border-color: {ACCENT}; }}"
         )
         self._search_box.textChanged.connect(self._on_search)
         controls.addWidget(self._search_box, 0, Qt.AlignmentFlag.AlignVCenter)
-
-        kbd = QLabel("⌘K", inner)
-        kbd.setStyleSheet(
-            f"color: {INK_4}; background: {SURFACE_ALT}; border: 1px solid {LINE};"
-            f" padding: 2px 6px; font-size: 10px; font-weight: 800;"
-            f" font-family: {FONT_MONO};"
-        )
-        controls.addWidget(kbd, 0, Qt.AlignmentFlag.AlignVCenter)
 
         controls.addStretch(1)
 

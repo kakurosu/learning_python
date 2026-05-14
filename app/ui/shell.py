@@ -40,7 +40,6 @@ from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
-    QLineEdit,
     QPushButton,
     QStackedLayout,
     QVBoxLayout,
@@ -337,44 +336,9 @@ class TopBar(QFrame):
         self._crumb_layout.setSpacing(8)
         layout.addWidget(self._crumb_holder, 1, Qt.AlignmentFlag.AlignVCenter)
 
-        # Search box (cosmetic for now)
-        self._search = QLineEdit(self)
-        self._search.setPlaceholderText("章・キーワードを検索")
-        self._search.setFixedWidth(240)
-        self._search.setStyleSheet(
-            f"QLineEdit {{ background: {SURFACE_ALT}; color: {INK_2};"
-            f" border: 1px solid {LINE}; border-radius: 0;"
-            f" padding: 6px 10px; font-size: 12px; }}"
-            f"QLineEdit:focus {{ border-color: {ACCENT}; }}"
-        )
-        layout.addWidget(self._search, 0, Qt.AlignmentFlag.AlignVCenter)
-
-        # Shortcut hint
-        kbd = QLabel("⌘K", self)
-        kbd.setStyleSheet(
-            f"color: {INK_4}; background: {SURFACE}; border: 1px solid {LINE};"
-            f" padding: 1px 6px; font-size: 10px; font-weight: 800;"
-            f" font-family: {FONT_MONO};"
-        )
-        layout.addWidget(kbd, 0, Qt.AlignmentFlag.AlignVCenter)
-
-        # Streak
-        streak = QLabel("🔥 7 日連続", self)
-        streak.setStyleSheet(
-            f"color: {INK_3}; font-size: 11px; font-weight: 700;"
-        )
-        layout.addWidget(streak, 0, Qt.AlignmentFlag.AlignVCenter)
-
-        # Avatar — circle with initial
-        self._avatar = QLabel("Y", self)
-        self._avatar.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._avatar.setFixedSize(28, 28)
-        self._avatar.setStyleSheet(
-            f"background: {ACCENT}; color: white; border: none;"
-            f" font-size: 12px; font-weight: 800;"
-            f" font-family: 'Inter Variable', 'Inter', sans-serif;"
-        )
-        layout.addWidget(self._avatar, 0, Qt.AlignmentFlag.AlignVCenter)
+        # Right-side widgets intentionally minimal: just enough whitespace
+        # for the breadcrumb to breathe. The previous streak / avatar /
+        # ⌘K chips read as "fake account UI" so we strip them.
 
         # Default breadcrumb
         self.set_breadcrumb("study.py", "Dashboard")
