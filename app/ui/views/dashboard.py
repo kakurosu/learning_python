@@ -92,7 +92,7 @@ class _Section(QFrame):
         # it wasn't clickable so we removed it.)
         k = QLabel(kicker, self)
         k.setStyleSheet(
-            f"color: {INK}; font-size: 13px; font-weight: 800; letter-spacing: -0.1px;"
+            f"color: {INK}; font-size: 15px; font-weight: 800; letter-spacing: -0.1px;"
         )
         self._layout.addWidget(k)
 
@@ -130,7 +130,7 @@ class _PhaseProgressRow(QFrame):
         badge.setFixedSize(26, 26)
         badge.setStyleSheet(
             f"background: transparent; color: {INK}; border: 1px solid {LINE};"
-            f" font-size: 12px; font-weight: 800;"
+            f" font-size: 14px; font-weight: 800;"
         )
         layout.addWidget(badge, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -144,7 +144,7 @@ class _PhaseProgressRow(QFrame):
         col.addWidget(t)
         sub = QLabel(f"{completed}/{total} 章", self)
         sub.setStyleSheet(
-            f"color: {INK_4}; font-size: 10px;"
+            f"color: {INK_4}; font-size: 12px;"
             f" letter-spacing: 0.3px;"
         )
         col.addWidget(sub)
@@ -163,7 +163,7 @@ class _PhaseProgressRow(QFrame):
         # Percent label
         v = QLabel(f"{pct}%", self)
         v.setStyleSheet(
-            f"color: {INK_2}; font-size: 12px; font-weight: 700;"
+            f"color: {INK_2}; font-size: 14px; font-weight: 700;"
             f" letter-spacing: 0;"
         )
         v.setFixedWidth(42)
@@ -195,19 +195,19 @@ class _StatBox(QFrame):
 
         v = QLabel(value, self)
         v.setStyleSheet(
-            f"color: {ACCENT if accent else INK}; font-size: 22px; font-weight: 800;"
+            f"color: {ACCENT if accent else INK}; font-size: 26px; font-weight: 800;"
             f" letter-spacing: -0.6px; font-family: {FONT_SANS_DISPLAY};"
         )
         l.addWidget(v)
         lab = QLabel(label, self)
         lab.setStyleSheet(
-            f"color: {INK_3}; font-size: 11px; font-weight: 700; letter-spacing: -0.1px;"
+            f"color: {INK_3}; font-size: 13px; font-weight: 700; letter-spacing: -0.1px;"
         )
         l.addWidget(lab)
         if sub:
             s = QLabel(sub, self)
             s.setStyleSheet(
-                f"color: {SUCCESS}; font-size: 10px; font-weight: 700;"
+                f"color: {SUCCESS}; font-size: 12px; font-weight: 700;"
                 f" letter-spacing: 0;"
             )
             l.addWidget(s)
@@ -260,7 +260,7 @@ class _ContinueCard(QFrame):
         kicker = QLabel(kicker_text, self)
         kicker.setTextFormat(Qt.TextFormat.RichText)
         kicker.setStyleSheet(
-            f"font-size: 11px; letter-spacing: 0.4px;"
+            f"font-size: 13px; letter-spacing: 0.4px;"
         )
         left.addWidget(kicker)
         left.addSpacing(10)
@@ -270,7 +270,7 @@ class _ContinueCard(QFrame):
             self,
         )
         title.setStyleSheet(
-            f"color: {INK}; font-size: 30px; font-weight: 800; letter-spacing: -0.8px;"
+            f"color: {INK}; font-size: 36px; font-weight: 800; letter-spacing: -0.8px;"
             f" font-family: {FONT_SANS_DISPLAY};"
         )
         title.setWordWrap(True)
@@ -282,7 +282,7 @@ class _ContinueCard(QFrame):
             else "第 1 章から学習を始めましょう。"
         )
         sub = QLabel(sub_text, self)
-        sub.setStyleSheet(f"color: {INK_3}; font-size: 13px; letter-spacing: -0.1px;")
+        sub.setStyleSheet(f"color: {INK_3}; font-size: 15px; letter-spacing: -0.1px;")
         sub.setWordWrap(True)
         left.addWidget(sub)
         left.addStretch(1)
@@ -295,25 +295,19 @@ class _ContinueCard(QFrame):
         resume.setStyleSheet(
             f"QPushButton {{ background: {ACCENT}; color: white;"
             f" border: 1px solid {ACCENT}; border-radius: 0;"
-            f" padding: 9px 22px; font-size: 12px; font-weight: 700;"
+            f" padding: 9px 22px; font-size: 14px; font-weight: 700;"
             f" min-width: 0; min-height: 0; }}"
             f"QPushButton:hover {{ background: #F87171; border-color: #F87171; }}"
         )
         resume.clicked.connect(self.clicked.emit)
         btn_row.addWidget(resume)
 
-        list_link = QLabel("章のリストへ", self)
-        list_link.setStyleSheet(
-            f"color: {INK_3}; font-size: 12px; font-weight: 600;"
-        )
-        btn_row.addWidget(list_link)
-
         if chapter is not None:
             page_meta = QLabel(
                 f"ページ {last_page_idx + 1}/{len(chapter.pages)}", self
             )
             page_meta.setStyleSheet(
-                f"color: {INK_4}; font-size: 11px; font-weight: 700;"
+                f"color: {INK_4}; font-size: 13px; font-weight: 700;"
                 f" letter-spacing: 0;"
             )
             btn_row.addWidget(page_meta)
@@ -383,7 +377,7 @@ class DashboardView(QWidget):
         hero_col.setSpacing(2)
         hero = QLabel("こんにちは！", inner)
         hero.setStyleSheet(
-            f"color: {INK}; font-size: 26px; font-weight: 800; letter-spacing: -0.6px;"
+            f"color: {INK}; font-size: 32px; font-weight: 800; letter-spacing: -0.6px;"
             f" font-family: {FONT_SANS_DISPLAY};"
         )
         hero_col.addWidget(hero)
@@ -399,7 +393,7 @@ class DashboardView(QWidget):
                 sub = QLabel("章を選んで学習を始めましょう。", inner)
         else:
             sub = QLabel("第 1 章から学習を始めましょう。", inner)
-        sub.setStyleSheet(f"color: {INK_3}; font-size: 13px; letter-spacing: -0.1px;")
+        sub.setStyleSheet(f"color: {INK_3}; font-size: 15px; letter-spacing: -0.1px;")
         hero_col.addWidget(sub)
         hero_row.addLayout(hero_col, 1)
         layout.addLayout(hero_row)
@@ -553,7 +547,7 @@ class _QuickActionRow(QFrame):
         ic.setFixedWidth(20)
         ic.setStyleSheet(
             f"color: {INK_3}; background: transparent; border: none;"
-            f" font-size: 14px; font-weight: 700;"
+            f" font-size: 16px; font-weight: 700;"
         )
         layout.addWidget(ic, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -562,17 +556,17 @@ class _QuickActionRow(QFrame):
         t = QLabel(title, self)
         t.setObjectName("qaTitle")
         t.setStyleSheet(
-            f"color: {INK}; font-size: 13px; font-weight: 700; letter-spacing: -0.1px;"
+            f"color: {INK}; font-size: 15px; font-weight: 700; letter-spacing: -0.1px;"
         )
         col.addWidget(t)
         s = QLabel(subtitle, self)
-        s.setStyleSheet(f"color: {INK_4}; font-size: 11px;")
+        s.setStyleSheet(f"color: {INK_4}; font-size: 13px;")
         col.addWidget(s)
         layout.addLayout(col, 1)
 
         arrow = QLabel("→", self)
         arrow.setObjectName("qaArrow")
-        arrow.setStyleSheet(f"color: {INK_4}; font-size: 14px; font-weight: 400;")
+        arrow.setStyleSheet(f"color: {INK_4}; font-size: 16px; font-weight: 400;")
         layout.addWidget(arrow, 0, Qt.AlignmentFlag.AlignVCenter)
 
     def mousePressEvent(self, e) -> None:  # noqa: N802

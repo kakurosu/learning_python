@@ -73,13 +73,13 @@ class _FilterChip(QPushButton):
             return (
                 f"QPushButton {{ background: {ACCENT_TINT}; color: {INK};"
                 f" border: 1px solid {ACCENT}; border-radius: 0;"
-                f" padding: 5px 12px; font-size: 11px; font-weight: 800;"
+                f" padding: 5px 12px; font-size: 13px; font-weight: 800;"
                 f" min-width: 0; min-height: 0; letter-spacing: -0.1px; }}"
             )
         return (
             f"QPushButton {{ background: transparent; color: {INK_3};"
             f" border: 1px solid {LINE}; border-radius: 0;"
-            f" padding: 5px 12px; font-size: 11px; font-weight: 700;"
+            f" padding: 5px 12px; font-size: 13px; font-weight: 700;"
             f" min-width: 0; min-height: 0; letter-spacing: -0.1px; }}"
             f"QPushButton:hover {{ color: {INK}; border-color: {INK_5}; }}"
         )
@@ -115,7 +115,7 @@ class _ChapterCard(QFrame):
 
         num = QLabel(f"{chapter.id:02d}", self)
         num.setStyleSheet(
-            f"color: {INK_4}; font-size: 12px; font-weight: 700;"
+            f"color: {INK_4}; font-size: 14px; font-weight: 700;"
             f" letter-spacing: 0.4px;"
         )
         num.setMinimumWidth(28)
@@ -127,12 +127,12 @@ class _ChapterCard(QFrame):
         t = QLabel(chapter.title, self)
         t.setObjectName("ccv2Title")
         t.setStyleSheet(
-            f"color: {INK}; font-size: 13px; font-weight: 700; letter-spacing: -0.1px;"
+            f"color: {INK}; font-size: 15px; font-weight: 700; letter-spacing: -0.1px;"
         )
         col.addWidget(t)
         if chapter.learning_goals:
             sub = QLabel(chapter.learning_goals[0], self)
-            sub.setStyleSheet(f"color: {INK_4}; font-size: 11px;")
+            sub.setStyleSheet(f"color: {INK_4}; font-size: 13px;")
             sub.setWordWrap(False)
             col.addWidget(sub)
         layout.addLayout(col, 1)
@@ -160,14 +160,14 @@ class _ChapterCard(QFrame):
         }.get(status, ("—", INK_4))
         st = QLabel(st_text, self)
         st.setStyleSheet(
-            f"color: {st_color}; font-size: 10px; font-weight: 800;"
+            f"color: {st_color}; font-size: 12px; font-weight: 800;"
             f" letter-spacing: 0.3px;"
         )
         st.setMinimumWidth(110)
         layout.addWidget(st, 0, Qt.AlignmentFlag.AlignVCenter)
 
         arrow = QLabel("→", self)
-        arrow.setStyleSheet(f"color: {INK_4}; font-size: 14px;")
+        arrow.setStyleSheet(f"color: {INK_4}; font-size: 16px;")
         layout.addWidget(arrow, 0, Qt.AlignmentFlag.AlignVCenter)
 
     def mousePressEvent(self, e) -> None:  # noqa: N802
@@ -200,7 +200,7 @@ class _PhaseHeader(QFrame):
         letter.setFixedSize(54, 54)
         letter.setStyleSheet(
             f"color: {INK}; background: transparent; border: 1px solid {LINE};"
-            f" font-size: 28px; font-weight: 800; letter-spacing: -1px;"
+            f" font-size: 34px; font-weight: 800; letter-spacing: -1px;"
             f" font-family: {FONT_SANS_DISPLAY};"
         )
         layout.addWidget(letter, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -209,18 +209,18 @@ class _PhaseHeader(QFrame):
         col.setSpacing(2)
         kicker = QLabel(PHASE_LABELS[phase], self)
         kicker.setStyleSheet(
-            f"color: {ACCENT}; font-size: 10px; font-weight: 800;"
+            f"color: {ACCENT}; font-size: 12px; font-weight: 800;"
             f" letter-spacing: 0.6px;"
         )
         col.addWidget(kicker)
         t = QLabel(title, self)
         t.setStyleSheet(
-            f"color: {INK}; font-size: 22px; font-weight: 800; letter-spacing: -0.6px;"
+            f"color: {INK}; font-size: 26px; font-weight: 800; letter-spacing: -0.6px;"
             f" font-family: {FONT_SANS_DISPLAY};"
         )
         col.addWidget(t)
         d = QLabel(desc, self)
-        d.setStyleSheet(f"color: {INK_3}; font-size: 12px;")
+        d.setStyleSheet(f"color: {INK_3}; font-size: 14px;")
         col.addWidget(d)
         layout.addLayout(col, 1)
 
@@ -229,14 +229,14 @@ class _PhaseHeader(QFrame):
         meta.setSpacing(2)
         n_text = QLabel(f"{total} 章", self)
         n_text.setStyleSheet(
-            f"color: {INK_2}; font-size: 14px; font-weight: 800;"
+            f"color: {INK_2}; font-size: 16px; font-weight: 800;"
             f" letter-spacing: 0;"
         )
         n_text.setAlignment(Qt.AlignmentFlag.AlignRight)
         meta.addWidget(n_text)
         s_text = QLabel(f"完了 {completed} · 進行中 {in_progress}", self)
         s_text.setStyleSheet(
-            f"color: {INK_4}; font-size: 10px; font-weight: 700;"
+            f"color: {INK_4}; font-size: 12px; font-weight: 700;"
             f" letter-spacing: 0.3px;"
         )
         s_text.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -301,7 +301,7 @@ class ChapterPickerView(QWidget):
         # ----- Hero -----
         title = QLabel("章を選ぶ", inner)
         title.setStyleSheet(
-            f"color: {INK}; font-size: 32px; font-weight: 800; letter-spacing: -1px;"
+            f"color: {INK}; font-size: 38px; font-weight: 800; letter-spacing: -1px;"
             f" font-family: {FONT_SANS_DISPLAY};"
         )
         layout.addWidget(title)
@@ -309,7 +309,7 @@ class ChapterPickerView(QWidget):
             "全 6 Phase · 32 章。気になる章から始めましょう。"
             "各章にはレッスン・練習・閃絡チェックが含まれます。", inner,
         )
-        sub.setStyleSheet(f"color: {INK_3}; font-size: 13px; letter-spacing: -0.1px;")
+        sub.setStyleSheet(f"color: {INK_3}; font-size: 15px; letter-spacing: -0.1px;")
         sub.setWordWrap(True)
         layout.addWidget(sub)
         layout.addSpacing(20)
@@ -324,7 +324,7 @@ class ChapterPickerView(QWidget):
         self._search_box.setStyleSheet(
             f"QLineEdit {{ background: transparent; color: {INK_2};"
             f" border: 1px solid {LINE}; border-radius: 0; padding: 7px 12px;"
-            f" font-size: 12px; }}"
+            f" font-size: 14px; }}"
             f"QLineEdit:focus {{ border-color: {ACCENT}; }}"
         )
         self._search_box.textChanged.connect(self._on_search)
@@ -362,7 +362,7 @@ class ChapterPickerView(QWidget):
             t.setStyleSheet(
                 f"QPushButton {{ background: transparent; color: {INK_3};"
                 f" border: 1px solid {LINE}; border-radius: 0;"
-                f" padding: 5px 12px; font-size: 11px; font-weight: 700;"
+                f" padding: 5px 12px; font-size: 13px; font-weight: 700;"
                 f" min-width: 0; min-height: 0; }}"
                 f"QPushButton:checked {{ background: {ACCENT_TINT};"
                 f" color: {INK}; border-color: {ACCENT}; }}"
