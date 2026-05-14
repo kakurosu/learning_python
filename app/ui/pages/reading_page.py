@@ -64,6 +64,7 @@ class ReadingPageWidget(QWidget):
         layout.addWidget(rule)
 
         prompt = QTextBrowser(inner)
+        prompt.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
         prompt.setMarkdown(render_latex_in_markdown(page.prompt))
         prompt.setStyleSheet(
             f"QTextBrowser {{ background: transparent; border: none; color: {INK};"

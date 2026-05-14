@@ -19,7 +19,7 @@ import tempfile
 import webbrowser
 from pathlib import Path
 
-from PyQt6.QtCore import QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame,
     QLabel,
@@ -168,6 +168,12 @@ class SamplePageWidget(QWidget):
 
         explanation = QTextBrowser(inner)
         explanation.setOpenExternalLinks(True)
+        # Read-only narrative — disable text selection so dragging doesn't
+        # produce the rectangular bounding-box highlight the user disliked.
+        # Hyperlinks still work via LinksAccessibleByMouse.
+        explanation.setTextInteractionFlags(
+            Qt.TextInteractionFlag.LinksAccessibleByMouse
+        )
         explanation.setMarkdown(render_latex_in_markdown(page.markdown))
         explanation.setStyleSheet(
             f"QTextBrowser {{ background: transparent; border: none; color: {INK};"

@@ -115,10 +115,15 @@ class SidebarNav(QFrame):
         badge.setFixedSize(22, 22)
         badge.setStyleSheet(f"background: {ACCENT}; border: none;")
         mark_l.addWidget(badge, 0, Qt.AlignmentFlag.AlignVCenter)
-        wm_text = QLabel("study<span style='color:#A3A3A3'>.</span>py", mark)
+        wm_text = QLabel(
+            "Study Python<br/>"
+            "<span style='color:#A3A3A3; font-weight:600;'>for Finance</span>",
+            mark,
+        )
         wm_text.setTextFormat(Qt.TextFormat.RichText)
         wm_text.setStyleSheet(
-            f"color: {INK}; font-size: 14px; font-weight: 800; letter-spacing: -0.3px;"
+            f"color: {INK}; font-size: 12px; font-weight: 800; letter-spacing: -0.2px;"
+            f" line-height: 1.0;"
         )
         mark_l.addWidget(wm_text, 1, Qt.AlignmentFlag.AlignVCenter)
         ver = QLabel("v0.4", mark)
@@ -340,7 +345,7 @@ class TopBar(QFrame):
         # ⌘K chips read as "fake account UI" so we strip them.
 
         # Default breadcrumb
-        self.set_breadcrumb("study.py", "Dashboard")
+        self.set_breadcrumb("Study Python for Finance", "Dashboard")
 
     # ------------------------------------------------------------------
     def set_breadcrumb(self, *parts: str) -> None:

@@ -79,22 +79,9 @@ class ChapterView(QWidget):
         head_layout.setContentsMargins(32, 0, 32, 8)
         head_layout.setSpacing(16)
 
-        # Wordmark (left)
-        wordmark = QLabel(header)
-        wordmark.setText(
-            f'<span style="color:{INK}; font-weight:800; letter-spacing:-0.3px;">STUDY</span>'
-            f'<span style="color:{ACCENT}; font-weight:800;">.</span>'
-            f'<span style="color:{INK}; font-weight:800; letter-spacing:-0.3px;">PY</span>'
-        )
-        wordmark.setStyleSheet("font-size: 14px;")
-        head_layout.addWidget(wordmark)
-
-        # Strong vertical separator between wordmark and breadcrumb
-        sep_a = QFrame(header)
-        sep_a.setStyleSheet(f"background: {LINE};")
-        sep_a.setFixedSize(1, 28)
-        head_layout.addWidget(sep_a)
-
+        # Brand wordmark intentionally omitted — the sidebar / breadcrumb
+        # already carry "Study Python for Finance". Within the chapter view
+        # we go straight to the chapter context (Phase / Ch / Title).
         phase_lbl = QLabel(_phase_label(chapter.phase), header)
         phase_lbl.setStyleSheet(
             f"color: {ACCENT}; font-size: 11px; font-weight: 700; letter-spacing: 0;"

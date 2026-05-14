@@ -136,6 +136,7 @@ class ExercisePageWidget(QWidget):
         layout.addSpacing(6)
 
         prompt = QTextBrowser(inner)
+        prompt.setTextInteractionFlags(Qt.TextInteractionFlag.LinksAccessibleByMouse)
         prompt.setMarkdown(render_latex_in_markdown(self.page.prompt))
         prompt.setStyleSheet(
             f"QTextBrowser {{ background: transparent; border: none; color: {INK_2};"
@@ -194,10 +195,6 @@ class ExercisePageWidget(QWidget):
         else:
             self._solution_btn.hide()
 
-        xp_hint = QLabel("ヒントを使うと XP が <span style='color:#A3A3A3'>-20%</span>", inner)
-        xp_hint.setTextFormat(Qt.TextFormat.RichText)
-        xp_hint.setStyleSheet(f"color: {INK_4}; font-size: 10px; padding-left: 8px;")
-        btn_row.addWidget(xp_hint, 0, Qt.AlignmentFlag.AlignVCenter)
         btn_row.addStretch(1)
         layout.addLayout(btn_row)
         layout.addStretch(1)
