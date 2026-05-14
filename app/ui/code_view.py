@@ -146,10 +146,6 @@ class _LineNumberArea(QWidget):
     def __init__(self, editor: "CodeView") -> None:
         super().__init__(editor)
         self._editor = editor
-        # Transparent gutter — paintEvent only draws numbers, no fill, so
-        # the page background shows through cleanly.
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
-        self.setAutoFillBackground(False)
 
     def sizeHint(self) -> QSize:  # noqa: N802
         return QSize(self._editor.line_number_area_width(), 0)
@@ -171,15 +167,13 @@ class CodeView(QPlainTextEdit):
         font.setStyleHint(QFont.StyleHint.Monospace)
         self.setFont(font)
 
-        # Transparent code surface — the editor inherits the page background
-        # instead of carrying its own filled rectangle. Syntax highlighting
-        # colors remain readable on the dark page.
         self.setStyleSheet(
             f"""
             QPlainTextEdit {{
-                background: transparent;
+                background: {VSCODE_BG};
                 color: {VSCODE_FG};
-                border: none;
+                border: 1px solid {VSCODE_GUTTER_BORDER};
+                border-top: none;
                 border-radius: 0;
                 padding: 8px 4px 8px 0;
                 selection-background-color: {VSCODE_SELECTION};
@@ -187,11 +181,6 @@ class CodeView(QPlainTextEdit):
             }}
             """
         )
-        # Setting the QPlainTextEdit stylesheet to transparent isn't enough
-        # on its own — the underlying viewport keeps its palette base color.
-        # We override both so the page background shows through completely.
-        self.viewport().setStyleSheet("background: transparent;")
-        self.viewport().setAutoFillBackground(False)
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.setTabStopDistance(QFontMetricsF(font).horizontalAdvance(" ") * 4)
@@ -230,8 +219,10 @@ class CodeView(QPlainTextEdit):
 
     def line_number_area_paint_event(self, event) -> None:
         painter = QPainter(self._line_number_area)
-        # Gutter has no fill — the page background shows through so the
-        # gutter does not appear as a separate darker strip.
+        painter.fillRect(event.rect(), QColor(VSCODE_GUTTER_BG))
+        painter.setPen(QColor(VSCODE_GUTTER_BORDER))
+        x = self._line_number_area.width() - 1
+        painter.drawLine(x, event.rect().top(), x, event.rect().bottom())
 
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
@@ -279,8 +270,10 @@ class CodeBlock(QFrame):
     ) -> None:
         super().__init__(parent)
         self.setObjectName("CodeBlock")
-        # No fill on the outer card — only the page background shows through.
-        self.setStyleSheet("#CodeBlock { background: transparent; border: none; }")
+        # Outer card carries the code-block surface fill; only the header
+        # bar above (handled below) is transparent so the file name does
+        # not appear in a separate-colored rectangle of its own.
+        self.setStyleSheet(f"#CodeBlock {{ background: {VSCODE_BG}; border: none; }}")
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)

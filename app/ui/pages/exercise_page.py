@@ -236,7 +236,7 @@ class ExercisePageWidget(QWidget):
         card = QFrame(parent)
         card.setObjectName("ExerciseEditorCard")
         card.setStyleSheet(
-            f"#ExerciseEditorCard {{ background: transparent;"
+            f"#ExerciseEditorCard {{ background: #1E1E1E;"
             f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
         )
         card_l = QVBoxLayout(card)
@@ -282,9 +282,11 @@ class ExercisePageWidget(QWidget):
         card_l.addWidget(header)
         card_l.addWidget(self._divider(card))
 
-        # 2) Code body
+        # 2) Code body — keeps the dark editor surface; only the file tab
+        # row above is transparent so the file name doesn't get its own
+        # tinted rectangle.
         code_body = QWidget(card)
-        code_body.setStyleSheet("background: transparent; border: none;")
+        code_body.setStyleSheet("background: #1E1E1E; border: none;")
         code_layout = QVBoxLayout(code_body)
         code_layout.setContentsMargins(20, 14, 20, 14)
         code_layout.setSpacing(2)
@@ -292,11 +294,9 @@ class ExercisePageWidget(QWidget):
         card_l.addWidget(code_body, 1)
         card_l.addWidget(self._divider(card))
 
-        # 3) Status strip — same background as the rest of the editor card
-        # so the entire card reads as one uniform surface (thin divider line
-        # above only).
+        # 3) Status strip — same dark surface as the code body.
         status = QWidget(card)
-        status.setStyleSheet("background: transparent; border: none;")
+        status.setStyleSheet("background: #1E1E1E; border: none;")
         status.setFixedHeight(24)
         sl = QHBoxLayout(status)
         sl.setContentsMargins(12, 0, 12, 0)
@@ -324,7 +324,7 @@ class ExercisePageWidget(QWidget):
         console = QFrame(parent)
         console.setObjectName("ExerciseConsoleCard")
         console.setStyleSheet(
-            f"#ExerciseConsoleCard {{ background: transparent;"
+            f"#ExerciseConsoleCard {{ background: #0F0F0F;"
             f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
         )
         console.setFixedHeight(72)
