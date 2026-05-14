@@ -124,7 +124,7 @@ class SidebarNav(QFrame):
         ver = QLabel("v0.4", mark)
         ver.setStyleSheet(
             f"color: {INK_4}; font-size: 10px; font-weight: 700;"
-            f" font-family: {FONT_MONO}; letter-spacing: 0.4px;"
+            f" letter-spacing: 0.2px;"
         )
         mark_l.addWidget(ver, 0, Qt.AlignmentFlag.AlignVCenter)
         outer.addWidget(mark)
@@ -161,8 +161,7 @@ class SidebarNav(QFrame):
         row.addWidget(self._mini_label, 1)
         self._mini_pct = QLabel("0%", self._mini)
         self._mini_pct.setStyleSheet(
-            f"color: {INK}; font-size: 12px; font-weight: 800;"
-            f" font-family: {FONT_MONO}; letter-spacing: 0;"
+            f"color: {INK}; font-size: 12px; font-weight: 800; letter-spacing: -0.1px;"
         )
         row.addWidget(self._mini_pct)
         ml.addLayout(row)
@@ -182,10 +181,10 @@ class SidebarNav(QFrame):
         self._mini_chap = QLabel("—", self._mini)
         self._mini_chap.setStyleSheet(f"color: {INK_3}; font-size: 11px;")
         bot.addWidget(self._mini_chap, 1)
-        self._mini_cta = QLabel("continue →", self._mini)
+        self._mini_cta = QLabel("つづける →", self._mini)
         self._mini_cta.setStyleSheet(
             f"color: {ACCENT}; font-size: 11px; font-weight: 800;"
-            f" font-family: {FONT_MONO};"
+            f" letter-spacing: -0.1px;"
         )
         bot.addWidget(self._mini_cta)
         ml.addLayout(bot)

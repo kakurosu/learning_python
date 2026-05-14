@@ -134,8 +134,7 @@ class ChapterView(QWidget):
         # Right side: page counter + back
         self._page_count_lbl = QLabel("", header)
         self._page_count_lbl.setStyleSheet(
-            f"color: {INK_3}; font-size: 11px; font-weight: 700; letter-spacing: 0.4px;"
-            f" font-family: 'JetBrains Mono', 'Cascadia Mono', 'Consolas', monospace;"
+            f"color: {INK_3}; font-size: 11px; font-weight: 700; letter-spacing: 0.2px;"
             f" padding: 4px 12px 4px 0;"
         )
         head_layout.addWidget(self._page_count_lbl, 0, Qt.AlignmentFlag.AlignVCenter)

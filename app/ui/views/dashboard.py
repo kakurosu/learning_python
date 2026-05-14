@@ -41,7 +41,6 @@ from ...resources.theme import (
     ACCENT,
     ACCENT_TINT,
     BG,
-    FONT_MONO,
     FONT_SANS_DISPLAY,
     INK,
     INK_2,
@@ -138,7 +137,7 @@ class _PhaseProgressRow(QFrame):
         badge.setFixedSize(26, 26)
         badge.setStyleSheet(
             f"background: transparent; color: {INK}; border: 1px solid {LINE};"
-            f" font-size: 12px; font-weight: 800; font-family: {FONT_MONO};"
+            f" font-size: 12px; font-weight: 800;"
         )
         layout.addWidget(badge, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -152,7 +151,7 @@ class _PhaseProgressRow(QFrame):
         col.addWidget(t)
         sub = QLabel(f"{completed}/{total} 章", self)
         sub.setStyleSheet(
-            f"color: {INK_4}; font-size: 10px; font-family: {FONT_MONO};"
+            f"color: {INK_4}; font-size: 10px;"
             f" letter-spacing: 0.3px;"
         )
         col.addWidget(sub)
@@ -171,7 +170,7 @@ class _PhaseProgressRow(QFrame):
         # Percent label
         v = QLabel(f"{pct}%", self)
         v.setStyleSheet(
-            f"color: {INK_2}; font-size: 12px; font-weight: 700; font-family: {FONT_MONO};"
+            f"color: {INK_2}; font-size: 12px; font-weight: 700;"
             f" letter-spacing: 0;"
         )
         v.setFixedWidth(42)
@@ -216,7 +215,7 @@ class _StatBox(QFrame):
             s = QLabel(sub, self)
             s.setStyleSheet(
                 f"color: {SUCCESS}; font-size: 10px; font-weight: 700;"
-                f" font-family: {FONT_MONO}; letter-spacing: 0;"
+                f" letter-spacing: 0;"
             )
             l.addWidget(s)
 
@@ -268,7 +267,7 @@ class _ContinueCard(QFrame):
         kicker = QLabel(kicker_text, self)
         kicker.setTextFormat(Qt.TextFormat.RichText)
         kicker.setStyleSheet(
-            f"font-size: 11px; font-family: {FONT_MONO}; letter-spacing: 0.4px;"
+            f"font-size: 11px; letter-spacing: 0.4px;"
         )
         left.addWidget(kicker)
         left.addSpacing(10)
@@ -322,7 +321,7 @@ class _ContinueCard(QFrame):
             )
             page_meta.setStyleSheet(
                 f"color: {INK_4}; font-size: 11px; font-weight: 700;"
-                f" font-family: {FONT_MONO}; letter-spacing: 0;"
+                f" letter-spacing: 0;"
             )
             btn_row.addWidget(page_meta)
         btn_row.addStretch(1)

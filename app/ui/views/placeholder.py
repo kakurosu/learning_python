@@ -14,7 +14,6 @@ from PyQt6.QtWidgets import (
 
 from ...resources.theme import (
     ACCENT,
-    FONT_MONO,
     FONT_SANS_DISPLAY,
     INK,
     INK_3,
@@ -36,7 +35,7 @@ class PlaceholderView(QWidget):
         kicker = QLabel("Soon", self)
         kicker.setStyleSheet(
             f"color: {ACCENT}; font-size: 10px; font-weight: 800; letter-spacing: 0.6px;"
-            f" font-family: {FONT_MONO};"
+            f""
         )
         outer.addWidget(kicker)
         outer.addSpacing(8)

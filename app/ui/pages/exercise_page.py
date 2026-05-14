@@ -206,20 +206,37 @@ class ExercisePageWidget(QWidget):
         return scroll
 
     def _build_right_pane(self) -> QWidget:
-        """Single bordered card containing 4 contiguous regions:
-        header → code body → status strip → console. Each region is a plain
-        QWidget so there are no nested QFrame borders, and they are joined by
-        explicit 1px QFrame dividers — which guarantees a seamless visual
-        block regardless of DPI / Qt version quirks.
+        """Two-card layout:
+
+            ┌─ editor card ───────────────────┐
+            │ header tab │ Reset Format Run   │
+            ├─────────────────────────────────┤
+            │ code body (template + blanks)   │
+            ├─────────────────────────────────┤
+            │ ● Python 3.12 · kernel: ready … │
+            └─────────────────────────────────┘
+                  (12px gap)
+            ┌─ console card ──────────────────┐
+            │ ● idle  $ python exercise.py    │
+            │ > 空欄を埋めて Run を押してください  │
+            └─────────────────────────────────┘
+
+        Each card has exactly one outer border. The editor card uses thin
+        1px dividers internally; the console is fully detached below.
         """
         pane = QWidget(self)
         pane.setStyleSheet(f"background: {BG};")
         pane_l = QVBoxLayout(pane)
         pane_l.setContentsMargins(20, 24, 32, 24)
-        pane_l.setSpacing(0)
+        pane_l.setSpacing(12)
 
-        # --- single outer card with one border ----------------------------
-        card = QFrame(pane)
+        pane_l.addWidget(self._build_editor_card(pane), 1)
+        pane_l.addWidget(self._build_console_card(pane))
+        return pane
+
+    # ------------------------------------------------------------------
+    def _build_editor_card(self, parent: QWidget) -> QFrame:
+        card = QFrame(parent)
         card.setObjectName("ExerciseEditorCard")
         card.setStyleSheet(
             f"#ExerciseEditorCard {{ background: #1E1E1E;"
@@ -229,7 +246,7 @@ class ExercisePageWidget(QWidget):
         card_l.setContentsMargins(0, 0, 0, 0)
         card_l.setSpacing(0)
 
-        # 1) File tab header --------------------------------------------
+        # 1) File tab header
         header = QWidget(card)
         header.setStyleSheet("background: #252526; border: none;")
         header.setFixedHeight(38)
@@ -266,7 +283,7 @@ class ExercisePageWidget(QWidget):
         card_l.addWidget(header)
         card_l.addWidget(self._divider(card))
 
-        # 2) Code body (template + blank slots) -------------------------
+        # 2) Code body
         code_body = QWidget(card)
         code_body.setStyleSheet("background: #1E1E1E; border: none;")
         code_layout = QVBoxLayout(code_body)
@@ -276,7 +293,7 @@ class ExercisePageWidget(QWidget):
         card_l.addWidget(code_body, 1)
         card_l.addWidget(self._divider(card))
 
-        # 3) Status strip (Python 3.12 · kernel: ready · UTF-8 · access:N)
+        # 3) Status strip
         status = QWidget(card)
         status.setStyleSheet("background: #181818; border: none;")
         status.setFixedHeight(24)
@@ -300,14 +317,18 @@ class ExercisePageWidget(QWidget):
             sl.addWidget(lbl)
         sl.addStretch(1)
         card_l.addWidget(status)
-        card_l.addWidget(self._divider(card))
+        return card
 
-        # 4) Console echo ----------------------------------------------
-        console = QWidget(card)
-        console.setStyleSheet("background: #0F0F0F; border: none;")
-        console.setFixedHeight(60)
+    def _build_console_card(self, parent: QWidget) -> QFrame:
+        console = QFrame(parent)
+        console.setObjectName("ExerciseConsoleCard")
+        console.setStyleSheet(
+            f"#ExerciseConsoleCard {{ background: #0F0F0F;"
+            f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
+        )
+        console.setFixedHeight(72)
         cl = QVBoxLayout(console)
-        cl.setContentsMargins(14, 10, 14, 10)
+        cl.setContentsMargins(16, 12, 16, 12)
         cl.setSpacing(4)
         prompt1 = QLabel(
             "<span style='color:#10B981'>●</span> "
@@ -333,16 +354,13 @@ class ExercisePageWidget(QWidget):
             f" background: transparent; border: none;"
         )
         cl.addWidget(prompt2)
-        card_l.addWidget(console)
-
-        pane_l.addWidget(card)
-        return pane
+        return console
 
     @staticmethod
     def _divider(parent: QWidget) -> QFrame:
         """Thin horizontal 1px line used as an internal divider inside the
-        editor card. Same color as the outer border so the whole card reads
-        as a single rectangle with internal sections."""
+        editor card. Same color as the outer border so the editor card
+        reads as one rectangle with subtle internal section breaks."""
         d = QFrame(parent)
         d.setFixedHeight(1)
         d.setStyleSheet(f"background: {VSCODE_GUTTER_BORDER}; border: none;")

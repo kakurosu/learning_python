@@ -39,7 +39,6 @@ from ...resources.theme import (
     ACCENT,
     ACCENT_TINT,
     BG,
-    FONT_MONO,
     FONT_SANS_DISPLAY,
     INK,
     INK_2,
@@ -115,7 +114,7 @@ class _ChapterCard(QFrame):
         num = QLabel(f"{chapter.id:02d}", self)
         num.setStyleSheet(
             f"color: {INK_4}; font-size: 12px; font-weight: 700;"
-            f" font-family: {FONT_MONO}; letter-spacing: 0.4px;"
+            f" letter-spacing: 0.4px;"
         )
         num.setMinimumWidth(28)
         layout.addWidget(num, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -160,7 +159,7 @@ class _ChapterCard(QFrame):
         st = QLabel(st_text, self)
         st.setStyleSheet(
             f"color: {st_color}; font-size: 10px; font-weight: 800;"
-            f" letter-spacing: 0.3px; font-family: {FONT_MONO};"
+            f" letter-spacing: 0.3px;"
         )
         st.setMinimumWidth(110)
         layout.addWidget(st, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -209,7 +208,7 @@ class _PhaseHeader(QFrame):
         kicker = QLabel(PHASE_LABELS[phase], self)
         kicker.setStyleSheet(
             f"color: {ACCENT}; font-size: 10px; font-weight: 800;"
-            f" letter-spacing: 0.6px; font-family: {FONT_MONO};"
+            f" letter-spacing: 0.6px;"
         )
         col.addWidget(kicker)
         t = QLabel(title, self)
@@ -229,14 +228,14 @@ class _PhaseHeader(QFrame):
         n_text = QLabel(f"{total} 章", self)
         n_text.setStyleSheet(
             f"color: {INK_2}; font-size: 14px; font-weight: 800;"
-            f" font-family: {FONT_MONO}; letter-spacing: 0;"
+            f" letter-spacing: 0;"
         )
         n_text.setAlignment(Qt.AlignmentFlag.AlignRight)
         meta.addWidget(n_text)
         s_text = QLabel(f"完了 {completed} · 進行中 {in_progress}", self)
         s_text.setStyleSheet(
             f"color: {INK_4}; font-size: 10px; font-weight: 700;"
-            f" font-family: {FONT_MONO}; letter-spacing: 0.3px;"
+            f" letter-spacing: 0.3px;"
         )
         s_text.setAlignment(Qt.AlignmentFlag.AlignRight)
         meta.addWidget(s_text)
@@ -288,7 +287,7 @@ class ChapterPickerView(QWidget):
                 f" letter-spacing:0.3px;'>{label}</span>"
                 f" &nbsp;&nbsp;"
                 f"<span style='color:{color}; font-size:14px; font-weight:800;"
-                f" font-family:{FONT_MONO}; letter-spacing:0;'>{value}</span>",
+                f" letter-spacing:0;'>{value}</span>",
                 inner,
             )
             chunk.setTextFormat(Qt.TextFormat.RichText)

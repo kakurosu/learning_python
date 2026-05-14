@@ -84,8 +84,8 @@ class StickmanStrip(QFrame):
         # 1) "Mentor" label on the very left
         self._mood_lbl = QLabel("Mentor", self)
         self._mood_lbl.setStyleSheet(
-            f"color: {ACCENT}; font-size: 10px; font-weight: 800; letter-spacing: 0.4px;"
-            f" font-family: 'Cascadia Mono', Consolas, monospace; background: transparent;"
+            f"color: {ACCENT}; font-size: 10px; font-weight: 800; letter-spacing: 0.2px;"
+            f" background: transparent;"
         )
         self._mood_lbl.setFixedWidth(56)
         layout.addWidget(self._mood_lbl, 0, Qt.AlignmentFlag.AlignVCenter)
