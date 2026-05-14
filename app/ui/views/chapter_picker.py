@@ -95,12 +95,14 @@ class _ChapterCard(QFrame):
         self.chapter = chapter
         self.setObjectName("ChapterCardV2")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        # Hover keeps the same background as the body (no rectangular fill
+        # highlight). Visual feedback is just the red left bar + title color.
         self.setStyleSheet(
             f"""
             #ChapterCardV2 {{ background: transparent;
                 border: none; border-bottom: 1px solid {LINE};
                 border-left: 2px solid transparent; }}
-            #ChapterCardV2:hover {{ background: {SURFACE_ALT};
+            #ChapterCardV2:hover {{ background: transparent;
                 border-left: 2px solid {ACCENT}; }}
             #ChapterCardV2:hover #ccv2Title {{ color: {ACCENT}; }}
             """

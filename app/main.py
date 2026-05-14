@@ -185,7 +185,7 @@ class MainWindow(QMainWindow):
 
         # Default to dashboard
         self.shell.show_view("dashboard")
-        self.shell.topbar.set_breadcrumb("Study Python for Finance", "Dashboard")
+        self.shell.topbar.set_breadcrumb("Dashboard")
 
         # Update sidebar mini progress card
         self._refresh_mini_progress()
@@ -207,13 +207,13 @@ class MainWindow(QMainWindow):
     def _navigate_to(self, slug: str) -> None:
         """Switch sidebar to ``slug`` and refresh breadcrumb."""
         crumbs = {
-            "dashboard":  ("Study Python for Finance", "Dashboard"),
-            "chapters":   ("Study Python for Finance", "Chapters"),
-            "practice":   ("Study Python for Finance", "Practice"),
-            "tests":      ("Study Python for Finance", "Tests"),
-            "history":    ("Study Python for Finance", "History"),
-            "references": ("Study Python for Finance", "References"),
-            "settings":   ("Study Python for Finance", "Settings"),
+            "dashboard":  ("Dashboard"),
+            "chapters":   ("Chapters"),
+            "practice":   ("Practice"),
+            "tests":      ("Tests"),
+            "history":    ("History"),
+            "references": ("References"),
+            "settings":   ("Settings"),
         }
         self.shell.show_view(slug)
         self.shell.topbar.set_breadcrumb(*crumbs.get(slug, ("Study Python for Finance",)))
@@ -267,7 +267,7 @@ class MainWindow(QMainWindow):
         self._chapter_view = view
         self.shell.show_view("chapters")
         self.shell.topbar.set_breadcrumb(
-            "Study Python for Finance", f"Phase {ch.phase}", f"Ch {ch.id:02d}", ch.title,
+            f"Phase {ch.phase}", f"Ch {ch.id:02d}", ch.title,
         )
         self.shell.sidebar.set_active("chapters")
         self._refresh_mini_progress(active_chapter=ch, page=start_page_index)
@@ -303,7 +303,7 @@ class MainWindow(QMainWindow):
         self.shell.replace_view("tests", view)
         self._test_view = view
         self.shell.show_view("tests")
-        self.shell.topbar.set_breadcrumb("Study Python for Finance", "Tests", ts.title)
+        self.shell.topbar.set_breadcrumb("Tests", ts.title)
         self.shell.sidebar.set_active("tests")
 
     # ------------------------------------------------------------------

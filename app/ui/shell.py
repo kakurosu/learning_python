@@ -143,58 +143,8 @@ class SidebarNav(QFrame):
         self._items: dict[str, _NavItem] = {}
         outer.addWidget(nav_wrap, 1)
 
-        # --- mini progress card (bottom-of-sidebar) --------------------
-        self._mini = QFrame(self)
-        self._mini.setObjectName("MiniProgress")
-        self._mini.setStyleSheet(
-            f"""
-            #MiniProgress {{ background: {SURFACE}; border: none;
-                border-top: 1px solid {LINE}; }}
-            """
-        )
-        ml = QVBoxLayout(self._mini)
-        ml.setContentsMargins(18, 14, 18, 14)
-        ml.setSpacing(4)
-
-        # First row: label + percent
-        row = QHBoxLayout()
-        row.setContentsMargins(0, 0, 0, 0)
-        self._mini_label = QLabel("Phase A の進捗", self._mini)
-        self._mini_label.setStyleSheet(
-            f"color: {INK_3}; font-size: 10px; font-weight: 700; letter-spacing: 0.4px;"
-        )
-        row.addWidget(self._mini_label, 1)
-        self._mini_pct = QLabel("0%", self._mini)
-        self._mini_pct.setStyleSheet(
-            f"color: {INK}; font-size: 12px; font-weight: 800; letter-spacing: -0.1px;"
-        )
-        row.addWidget(self._mini_pct)
-        ml.addLayout(row)
-
-        # Thin progress track
-        self._mini_track = QFrame(self._mini)
-        self._mini_track.setStyleSheet(f"background: {LINE}; border: none;")
-        self._mini_track.setFixedHeight(3)
-        ml.addWidget(self._mini_track)
-        self._mini_fill = QFrame(self._mini_track)
-        self._mini_fill.setStyleSheet(f"background: {ACCENT}; border: none;")
-        self._mini_fill.setGeometry(0, 0, 0, 3)
-
-        # Bottom row: chapter # + continue
-        bot = QHBoxLayout()
-        bot.setContentsMargins(0, 4, 0, 0)
-        self._mini_chap = QLabel("—", self._mini)
-        self._mini_chap.setStyleSheet(f"color: {INK_3}; font-size: 11px;")
-        bot.addWidget(self._mini_chap, 1)
-        self._mini_cta = QLabel("つづける →", self._mini)
-        self._mini_cta.setStyleSheet(
-            f"color: {ACCENT}; font-size: 11px; font-weight: 800;"
-            f" letter-spacing: -0.1px;"
-        )
-        bot.addWidget(self._mini_cta)
-        ml.addLayout(bot)
-
-        outer.addWidget(self._mini)
+        # (Mini progress card removed — sidebar bottom is intentionally empty
+        # so the nav reads cleaner; progress lives on the dashboard.)
 
         self._active_slug: str | None = None
 
@@ -280,32 +230,19 @@ class SidebarNav(QFrame):
             f" text-align: left; min-width: 0; min-height: 0;"
             f" letter-spacing: -0.1px;"
             f" }}"
-            f"QPushButton:hover {{ background: {SURFACE}; color: {INK}; }}"
+            # Hover: text turns accent + left bar appears. No background fill.
+            f"QPushButton:hover {{ background: transparent; color: {ACCENT};"
+            f" border-left: 2px solid {ACCENT}; }}"
         )
 
     def _on_clicked(self, slug: str) -> None:
         self.activated.emit(slug)
 
     # ------------------------------------------------------------------
-    # Mini progress card API
-    def set_mini_progress(self, label: str, percent: int, chapter_text: str = "—") -> None:
-        self._mini_label.setText(label)
-        self._mini_pct.setText(f"{percent}%")
-        self._mini_chap.setText(chapter_text)
-        # Resize fill — clamp to track width
-        track_w = max(self._mini_track.width(), 1)
-        fill_w = int(track_w * max(0, min(100, percent)) / 100)
-        self._mini_fill.setGeometry(0, 0, fill_w, 3)
-
-    def resizeEvent(self, e) -> None:  # noqa: N802
-        super().resizeEvent(e)
-        # Keep the fill bar correctly sized when the track resizes
-        try:
-            pct = int(self._mini_pct.text().rstrip("%"))
-        except ValueError:
-            pct = 0
-        fill_w = int(self._mini_track.width() * max(0, min(100, pct)) / 100)
-        self._mini_fill.setGeometry(0, 0, fill_w, 3)
+    # Mini progress API kept as a no-op so existing callers (main.py) still
+    # work after the card was removed.
+    def set_mini_progress(self, *_args, **_kwargs) -> None:
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -344,8 +281,9 @@ class TopBar(QFrame):
         # for the breadcrumb to breathe. The previous streak / avatar /
         # ⌘K chips read as "fake account UI" so we strip them.
 
-        # Default breadcrumb
-        self.set_breadcrumb("Study Python for Finance", "Dashboard")
+        # Default breadcrumb — the brand is already in the sidebar, so the
+        # crumb starts with the section name only.
+        self.set_breadcrumb("Dashboard")
 
     # ------------------------------------------------------------------
     def set_breadcrumb(self, *parts: str) -> None:

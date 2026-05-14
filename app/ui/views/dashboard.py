@@ -88,20 +88,13 @@ class _Section(QFrame):
         self._layout.setContentsMargins(20, 18, 20, 18)
         self._layout.setSpacing(12)
 
-        # Top row: kicker + arrow link (cosmetic)
-        head = QHBoxLayout()
-        head.setContentsMargins(0, 0, 0, 0)
+        # Section header — kicker only. (No cosmetic "すべて →" arrow:
+        # it wasn't clickable so we removed it.)
         k = QLabel(kicker, self)
         k.setStyleSheet(
             f"color: {INK}; font-size: 13px; font-weight: 800; letter-spacing: -0.1px;"
         )
-        head.addWidget(k, 1)
-        arrow = QLabel("すべて →", self)
-        arrow.setStyleSheet(
-            f"color: {INK_4}; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;"
-        )
-        head.addWidget(arrow)
-        self._layout.addLayout(head)
+        self._layout.addWidget(k)
 
     def add_widget(self, w: QWidget) -> None:
         self._layout.addWidget(w)
@@ -536,32 +529,38 @@ class _QuickActionRow(QFrame):
         super().__init__(parent)
         self.setObjectName("QuickActionRow")
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        # No background fill on hover (the rectangular highlight was
+        # distracting). Instead the title and arrow turn accent red.
         self.setStyleSheet(
             f"""
             #QuickActionRow {{ background: transparent;
                 border: none; border-bottom: 1px solid {LINE}; }}
-            #QuickActionRow:hover {{ background: {SURFACE_ALT}; }}
+            #QuickActionRow:hover #qaTitle {{ color: {ACCENT}; }}
+            #QuickActionRow:hover #qaArrow {{ color: {ACCENT}; }}
             """
         )
         self._slug = slug
         self._on_click = on_click
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 10, 0, 10)
-        layout.setSpacing(12)
+        layout.setContentsMargins(2, 10, 2, 10)
+        layout.setSpacing(14)
 
+        # Plain text glyph (no bordered square — the bordered square added a
+        # visible rectangle that conflicted with the flat row aesthetic).
         ic = QLabel(icon, self)
         ic.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        ic.setFixedSize(28, 28)
+        ic.setFixedWidth(20)
         ic.setStyleSheet(
-            f"color: {INK_2}; background: transparent; border: 1px solid {LINE};"
-            f" font-size: 13px; font-weight: 700;"
+            f"color: {INK_3}; background: transparent; border: none;"
+            f" font-size: 14px; font-weight: 700;"
         )
         layout.addWidget(ic, 0, Qt.AlignmentFlag.AlignVCenter)
 
         col = QVBoxLayout()
         col.setSpacing(0)
         t = QLabel(title, self)
+        t.setObjectName("qaTitle")
         t.setStyleSheet(
             f"color: {INK}; font-size: 13px; font-weight: 700; letter-spacing: -0.1px;"
         )
@@ -572,6 +571,7 @@ class _QuickActionRow(QFrame):
         layout.addLayout(col, 1)
 
         arrow = QLabel("→", self)
+        arrow.setObjectName("qaArrow")
         arrow.setStyleSheet(f"color: {INK_4}; font-size: 14px; font-weight: 400;")
         layout.addWidget(arrow, 0, Qt.AlignmentFlag.AlignVCenter)
 
