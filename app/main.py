@@ -207,16 +207,16 @@ class MainWindow(QMainWindow):
     def _navigate_to(self, slug: str) -> None:
         """Switch sidebar to ``slug`` and refresh breadcrumb."""
         crumbs = {
-            "dashboard":  ("Dashboard"),
-            "chapters":   ("Chapters"),
-            "practice":   ("Practice"),
-            "tests":      ("Tests"),
-            "history":    ("History"),
-            "references": ("References"),
-            "settings":   ("Settings"),
+            "dashboard":  ("Dashboard",),
+            "chapters":   ("Chapters",),
+            "practice":   ("Practice",),
+            "tests":      ("Tests",),
+            "history":    ("History",),
+            "references": ("References",),
+            "settings":   ("Settings",),
         }
         self.shell.show_view(slug)
-        self.shell.topbar.set_breadcrumb(*crumbs.get(slug, ("Study Python for Finance",)))
+        self.shell.topbar.set_breadcrumb(*crumbs.get(slug, ("Dashboard",)))
         if slug == "chapters":
             self.picker.refresh()
         if slug == "history":

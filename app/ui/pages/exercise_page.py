@@ -243,9 +243,11 @@ class ExercisePageWidget(QWidget):
         card_l.setContentsMargins(0, 0, 0, 0)
         card_l.setSpacing(0)
 
-        # 1) File tab header
+        # 1) File tab header — same background as code body so the editor
+        # card looks like a single uniform surface, just with a thin
+        # divider line below it.
         header = QWidget(card)
-        header.setStyleSheet("background: #252526; border: none;")
+        header.setStyleSheet("background: #1E1E1E; border: none;")
         header.setFixedHeight(38)
         h = QHBoxLayout(header)
         h.setContentsMargins(12, 0, 8, 0)
@@ -290,9 +292,11 @@ class ExercisePageWidget(QWidget):
         card_l.addWidget(code_body, 1)
         card_l.addWidget(self._divider(card))
 
-        # 3) Status strip
+        # 3) Status strip — same background as the rest of the editor card
+        # so the entire card reads as one uniform surface (thin divider line
+        # above only).
         status = QWidget(card)
-        status.setStyleSheet("background: #181818; border: none;")
+        status.setStyleSheet("background: #1E1E1E; border: none;")
         status.setFixedHeight(24)
         sl = QHBoxLayout(status)
         sl.setContentsMargins(12, 0, 12, 0)

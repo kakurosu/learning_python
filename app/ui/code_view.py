@@ -278,10 +278,13 @@ class CodeBlock(QFrame):
 
         header = QFrame(self)
         header.setObjectName("CodeBlockHeader")
+        # Header shares the same background as the code body so the file
+        # name "blends" with the editor instead of sitting on a separate
+        # darker band.
         header.setStyleSheet(
             f"""
             #CodeBlockHeader {{
-                background: #252526;
+                background: {VSCODE_BG};
                 border: 1px solid {VSCODE_GUTTER_BORDER};
                 border-bottom: none;
             }}
