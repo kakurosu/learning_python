@@ -235,10 +235,11 @@ class ExercisePageWidget(QWidget):
     def _build_editor_card(self, parent: QWidget) -> QFrame:
         card = QFrame(parent)
         card.setObjectName("ExerciseEditorCard")
-        card.setStyleSheet(
-            f"#ExerciseEditorCard {{ background: #1E1E1E;"
-            f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
-        )
+        # Outer container is transparent + borderless so the file tab row
+        # below sits on the page background (no separate-color rectangle
+        # around the file name). The code body widget keeps its own
+        # filled surface so the editor itself stays visibly framed.
+        card.setStyleSheet("#ExerciseEditorCard { background: transparent; border: none; }")
         card_l = QVBoxLayout(card)
         card_l.setContentsMargins(0, 0, 0, 0)
         card_l.setSpacing(0)
@@ -280,23 +281,36 @@ class ExercisePageWidget(QWidget):
                 btn.clicked.connect(self.submit_requested.emit)
             h.addWidget(btn)
         card_l.addWidget(header)
-        card_l.addWidget(self._divider(card))
+
+        # Inner editor surface that wraps the code body + status strip.
+        # This is the actual filled "editor card" — the outer #ExerciseEditorCard
+        # is just a transparent container so the file-tab header above can
+        # sit on the page background without a tinted rectangle of its own.
+        inner = QFrame(card)
+        inner.setObjectName("ExerciseInnerEditor")
+        inner.setStyleSheet(
+            f"#ExerciseInnerEditor {{ background: #1E1E1E;"
+            f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
+        )
+        inner_l = QVBoxLayout(inner)
+        inner_l.setContentsMargins(0, 0, 0, 0)
+        inner_l.setSpacing(0)
 
         # 2) Code body — keeps the dark editor surface; only the file tab
         # row above is transparent so the file name doesn't get its own
         # tinted rectangle.
-        code_body = QWidget(card)
-        code_body.setStyleSheet("background: #1E1E1E; border: none;")
+        code_body = QWidget(inner)
+        code_body.setStyleSheet("background: transparent; border: none;")
         code_layout = QVBoxLayout(code_body)
         code_layout.setContentsMargins(20, 14, 20, 14)
         code_layout.setSpacing(2)
         self._render_template_into(code_layout, self.page.code_template)
-        card_l.addWidget(code_body, 1)
-        card_l.addWidget(self._divider(card))
+        inner_l.addWidget(code_body, 1)
+        inner_l.addWidget(self._divider(inner))
 
-        # 3) Status strip — same dark surface as the code body.
-        status = QWidget(card)
-        status.setStyleSheet("background: #1E1E1E; border: none;")
+        # 3) Status strip — sits inside the same inner editor card.
+        status = QWidget(inner)
+        status.setStyleSheet("background: transparent; border: none;")
         status.setFixedHeight(24)
         sl = QHBoxLayout(status)
         sl.setContentsMargins(12, 0, 12, 0)
@@ -317,7 +331,9 @@ class ExercisePageWidget(QWidget):
             )
             sl.addWidget(lbl)
         sl.addStretch(1)
-        card_l.addWidget(status)
+        inner_l.addWidget(status)
+
+        card_l.addWidget(inner, 1)
         return card
 
     def _build_console_card(self, parent: QWidget) -> QFrame:

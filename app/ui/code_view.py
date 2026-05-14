@@ -270,10 +270,12 @@ class CodeBlock(QFrame):
     ) -> None:
         super().__init__(parent)
         self.setObjectName("CodeBlock")
-        # Outer card carries the code-block surface fill; only the header
-        # bar above (handled below) is transparent so the file name does
-        # not appear in a separate-colored rectangle of its own.
-        self.setStyleSheet(f"#CodeBlock {{ background: {VSCODE_BG}; border: none; }}")
+        # No fill on the outer card so the *header* row (which contains the
+        # file name) inherits the surrounding page background — the file
+        # label no longer carries its own darker tint. The code body widget
+        # below keeps its own filled surface, so only the file name area is
+        # transparent.
+        self.setStyleSheet("#CodeBlock { background: transparent; border: none; }")
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
