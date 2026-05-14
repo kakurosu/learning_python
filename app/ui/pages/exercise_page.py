@@ -413,6 +413,10 @@ class ExercisePageWidget(QWidget):
         # alignment doesn't shift when a template has 10+ lines.
         gutter_digits = max(2, len(str(len(lines))))
 
+        # All rows share the same fixed height so blank slots (taller QLineEdit
+        # widgets) and pure-text rows line up cleanly with their line numbers.
+        ROW_HEIGHT = 30
+
         for i, line in enumerate(lines, start=1):
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -426,7 +430,8 @@ class ExercisePageWidget(QWidget):
                 "color: #6E7681; background: transparent; border: none;"
                 " padding-right: 14px; padding-left: 4px;"
             )
-            row.addWidget(num_lbl, 0, Qt.AlignmentFlag.AlignTop)
+            num_lbl.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            row.addWidget(num_lbl, 0, Qt.AlignmentFlag.AlignVCenter)
 
             cursor = 0
             for m in _SLOT_RE.finditer(line):
@@ -438,17 +443,17 @@ class ExercisePageWidget(QWidget):
                     lbl.setStyleSheet(
                         "color: #D4D4D4; background: transparent; border: none;"
                     )
-                    row.addWidget(lbl)
+                    row.addWidget(lbl, 0, Qt.AlignmentFlag.AlignVCenter)
                 slot_id = m.group(1)
                 blank = self._blanks_by_id.get(slot_id)
                 if blank is None:
                     err = QLabel(m.group(0), self)
                     err.setStyleSheet(f"color: {ACCENT};")
-                    row.addWidget(err)
+                    row.addWidget(err, 0, Qt.AlignmentFlag.AlignVCenter)
                 else:
                     slot = BlankSlot(blank, self)
                     self._slots[slot_id] = slot
-                    row.addWidget(slot)
+                    row.addWidget(slot, 0, Qt.AlignmentFlag.AlignVCenter)
                 cursor = m.end()
             tail = line[cursor:]
             if tail:
@@ -457,11 +462,12 @@ class ExercisePageWidget(QWidget):
                 lbl.setStyleSheet(
                     "color: #D4D4D4; background: transparent; border: none;"
                 )
-                row.addWidget(lbl)
+                row.addWidget(lbl, 0, Qt.AlignmentFlag.AlignVCenter)
             row.addStretch(1)
             wrapper = QWidget(self)
             wrapper.setStyleSheet("background: transparent;")
             wrapper.setLayout(row)
+            wrapper.setFixedHeight(ROW_HEIGHT)
             container.addWidget(wrapper)
 
     # ------------------------------------------------------------------

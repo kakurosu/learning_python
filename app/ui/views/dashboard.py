@@ -2,7 +2,7 @@
 
 Layout:
     +----------------------------------------------------------------+
-    |  こんにちは、Study Friend さん。              [今日の学習] [累計XP] |
+    |  こんにちは！                                                  |
     |  前回の続きから...                                              |
     |  ─                                                              |
     |  +-------------------- Continue card --------------------+      |
@@ -381,7 +381,7 @@ class DashboardView(QWidget):
 
         hero_col = QVBoxLayout()
         hero_col.setSpacing(2)
-        hero = QLabel("こんにちは、Study Friend さん。", inner)
+        hero = QLabel("こんにちは！", inner)
         hero.setStyleSheet(
             f"color: {INK}; font-size: 26px; font-weight: 800; letter-spacing: -0.6px;"
             f" font-family: {FONT_SANS_DISPLAY};"
