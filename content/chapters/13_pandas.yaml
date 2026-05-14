@@ -1,7 +1,7 @@
-id: 12
+id: 13
 title: "pandas 入門"
 phase: B
-prerequisites: [11]
+prerequisites: [12]
 learning_goals:
   - "DataFrame と Series の違いを理解する"
   - "CSV を読み込んで列を選択できる"

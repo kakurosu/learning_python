@@ -1,7 +1,7 @@
 id: 32
 title: "コードを読もう — Phase F アプリ開発の総復習"
 phase: F
-prerequisites: [25, 26]
+prerequisites: [30, 31]
 learning_goals:
   - "Streamlit と PyAutoGUI / Playwright のコードを読み解ける"
 

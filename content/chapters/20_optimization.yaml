@@ -1,7 +1,7 @@
-id: 18
+id: 20
 title: "ポートフォリオ最適化"
 phase: C
-prerequisites: [16, 17]
+prerequisites: [18, 19]
 learning_goals:
   - "2 銘柄ポートフォリオの分散を計算できる"
   - "scipy.optimize.minimize で最小分散ポートフォリオを求める"

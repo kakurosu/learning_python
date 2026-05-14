@@ -1,7 +1,7 @@
-id: 17
+id: 19
 title: "シャープレシオ・情報比率"
 phase: C
-prerequisites: [16]
+prerequisites: [18]
 learning_goals:
   - "シャープレシオ SR = (μ - rf) / σ を計算できる"
   - "情報比率 IR = α / TE を計算できる"

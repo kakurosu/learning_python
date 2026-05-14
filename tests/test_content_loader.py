@@ -68,8 +68,10 @@ def test_chapter_id_mismatch_raises(tmp_path: Path) -> None:
 
 
 def test_load_reading_phase_a_chapter() -> None:
-    ch = load_chapter(CHAPTERS_DIR / "27_reading_phase_a.yaml")
-    assert ch.id == 27
+    # Reading chapter for Phase A — renumbered to slot in after Phase A's
+    # last regular chapter (10) instead of starting at 27.
+    ch = load_chapter(CHAPTERS_DIR / "11_reading_phase_a.yaml")
+    assert ch.id == 11
     assert ch.phase == "A"
     assert ch.pages, "reading chapter should have pages"
     assert all(isinstance(p, ReadingPage) for p in ch.pages)
@@ -80,9 +82,14 @@ def test_load_reading_phase_a_chapter() -> None:
 
 
 def test_load_all_reading_chapters() -> None:
-    """All 6 reading chapters (27-32) should load and contain only reading pages."""
-    for chapter_id in (27, 28, 29, 30, 31, 32):
-        matches = list(CHAPTERS_DIR.glob(f"{chapter_id:02d}_*.yaml"))
+    """All 6 reading review chapters load and contain only reading pages.
+
+    After the renumber, the reading reviews live at the slot immediately
+    after each phase's last regular chapter: 11 (A), 16 (B), 22 (C),
+    26 (D), 29 (E), 32 (F).
+    """
+    for chapter_id in (11, 16, 22, 26, 29, 32):
+        matches = list(CHAPTERS_DIR.glob(f"{chapter_id:02d}_reading_*.yaml"))
         assert matches, f"reading chapter {chapter_id} YAML missing"
         ch = load_chapter(matches[0])
         assert ch.id == chapter_id

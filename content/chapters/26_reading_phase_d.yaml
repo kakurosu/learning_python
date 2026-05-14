@@ -1,7 +1,7 @@
-id: 30
+id: 26
 title: "コードを読もう — Phase D ML / DL の総復習"
 phase: D
-prerequisites: [20, 21, 22]
+prerequisites: [23, 24, 25]
 learning_goals:
   - "statsmodels の時系列、scikit-learn の機械学習、PyTorch の DL コードを読み解ける"
 

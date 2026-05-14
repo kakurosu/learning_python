@@ -1,7 +1,7 @@
-id: 15
+id: 17
 title: "期待値・分散・標準偏差"
 phase: C
-prerequisites: [11]
+prerequisites: [12]
 learning_goals:
   - "リターン系列から期待値 (E[r]) を計算できる"
   - "分散・標準偏差を不偏推定 (ddof=1) で計算できる"

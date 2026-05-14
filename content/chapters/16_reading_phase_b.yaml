@@ -1,7 +1,7 @@
-id: 28
+id: 16
 title: "コードを読もう — Phase B 数値ライブラリの総復習"
 phase: B
-prerequisites: [11, 12, 13, 14]
+prerequisites: [12, 13, 14, 15]
 learning_goals:
   - "NumPy のベクトル演算と pandas の DataFrame/Series 操作を読み解ける"
   - "matplotlib の基本的な描画コードの意味を理解する"

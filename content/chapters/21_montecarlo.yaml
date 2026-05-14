@@ -1,7 +1,7 @@
-id: 19
+id: 21
 title: "モンテカルロシミュレーション"
 phase: C
-prerequisites: [15, 18]
+prerequisites: [17, 20]
 learning_goals:
   - "GBM (幾何ブラウン運動) で価格パスを生成できる"
   - "ヨーロピアンコールオプションを MC で評価できる"

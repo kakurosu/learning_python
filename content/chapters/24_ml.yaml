@@ -1,7 +1,7 @@
-id: 21
+id: 24
 title: "機械学習入門 (scikit-learn)"
 phase: D
-prerequisites: [11, 14]
+prerequisites: [12, 15]
 learning_goals:
   - "train / test split で過学習を防ぐ理由を理解する"
   - "LinearRegression で回帰モデルを訓練できる"

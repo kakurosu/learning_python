@@ -1,7 +1,7 @@
-id: 20
+id: 23
 title: "時系列モデル"
 phase: D
-prerequisites: [14, 15]
+prerequisites: [15, 17]
 learning_goals:
   - "時系列データの自己相関を観察できる"
   - "statsmodels で AR / ARMA モデルを推定できる"

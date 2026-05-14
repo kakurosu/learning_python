@@ -1,7 +1,7 @@
-id: 25
+id: 30
 title: "Streamlit でダッシュボード"
 phase: F
-prerequisites: [12, 13]
+prerequisites: [13, 14]
 learning_goals:
   - "Streamlit の基本コンポーネント (title / write / line_chart / slider) を使える"
   - "スクリプトの再実行モデルを理解する"

@@ -1,7 +1,7 @@
-id: 14
+id: 15
 title: "pandas 応用 (groupby / merge / pct_change)"
 phase: B
-prerequisites: [12]
+prerequisites: [13]
 learning_goals:
   - "groupby で集計できる"
   - "merge で 2 つの DataFrame を結合できる"

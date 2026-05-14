@@ -408,10 +408,26 @@ class ExercisePageWidget(QWidget):
         mono = QFont("JetBrains Mono", 11)
         mono.setStyleHint(QFont.StyleHint.Monospace)
 
-        for line in template.splitlines():
+        lines = template.splitlines() or [""]
+        # Width of the line-number column — pad to 2 digits at minimum so
+        # alignment doesn't shift when a template has 10+ lines.
+        gutter_digits = max(2, len(str(len(lines))))
+
+        for i, line in enumerate(lines, start=1):
             row = QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(0)
+
+            # Line-number gutter (VSCode-style, right-aligned, muted color).
+            num_lbl = QLabel(str(i).rjust(gutter_digits), self)
+            num_lbl.setFont(mono)
+            num_lbl.setTextInteractionFlags(Qt.TextInteractionFlag.NoTextInteraction)
+            num_lbl.setStyleSheet(
+                "color: #6E7681; background: transparent; border: none;"
+                " padding-right: 14px; padding-left: 4px;"
+            )
+            row.addWidget(num_lbl, 0, Qt.AlignmentFlag.AlignTop)
+
             cursor = 0
             for m in _SLOT_RE.finditer(line):
                 pre = line[cursor : m.start()]

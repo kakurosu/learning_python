@@ -1,7 +1,7 @@
-id: 16
+id: 18
 title: "共分散・相関・トラッキングエラー"
 phase: C
-prerequisites: [15]
+prerequisites: [17]
 learning_goals:
   - "共分散と相関の関係を理解する"
   - "`np.cov` と `np.corrcoef` を使い分ける"

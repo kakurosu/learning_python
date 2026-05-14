@@ -1,7 +1,7 @@
-id: 13
+id: 14
 title: "matplotlib 入門"
 phase: B
-prerequisites: [12]
+prerequisites: [13]
 learning_goals:
   - "折れ線・棒・散布図・ヒストグラムを描ける"
   - "タイトル・軸ラベル・凡例を付けられる"

@@ -1,7 +1,7 @@
-id: 29
+id: 22
 title: "コードを読もう — Phase C 金融計算（CMA）の総復習"
 phase: C
-prerequisites: [15, 16, 17, 18, 19]
+prerequisites: [17, 18, 19, 20, 21]
 learning_goals:
   - "期待値・分散・共分散・シャープレシオの計算コードを読み解ける"
   - "ポートフォリオ最適化とモンテカルロのコード構造を理解する"

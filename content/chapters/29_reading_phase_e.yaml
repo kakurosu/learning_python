@@ -1,7 +1,7 @@
-id: 31
+id: 29
 title: "コードを読もう — Phase E 外部連携の総復習"
 phase: E
-prerequisites: [23, 24]
+prerequisites: [27, 28]
 learning_goals:
   - "requests + BeautifulSoup と Anthropic SDK を使ったコードを読み解ける"
 

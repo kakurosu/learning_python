@@ -1,7 +1,7 @@
-id: 22
+id: 25
 title: "ディープラーニング入門 (PyTorch)"
 phase: D
-prerequisites: [21]
+prerequisites: [24]
 learning_goals:
   - "PyTorch の Tensor / 自動微分の基本を理解する"
   - "1 層 MLP を nn.Linear で組める"
