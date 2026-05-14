@@ -236,7 +236,7 @@ class ExercisePageWidget(QWidget):
         card = QFrame(parent)
         card.setObjectName("ExerciseEditorCard")
         card.setStyleSheet(
-            f"#ExerciseEditorCard {{ background: #1E1E1E;"
+            f"#ExerciseEditorCard {{ background: transparent;"
             f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
         )
         card_l = QVBoxLayout(card)
@@ -247,7 +247,7 @@ class ExercisePageWidget(QWidget):
         # card looks like a single uniform surface, just with a thin
         # divider line below it.
         header = QWidget(card)
-        header.setStyleSheet("background: #1E1E1E; border: none;")
+        header.setStyleSheet("background: transparent; border: none;")
         header.setFixedHeight(38)
         h = QHBoxLayout(header)
         h.setContentsMargins(12, 0, 8, 0)
@@ -284,7 +284,7 @@ class ExercisePageWidget(QWidget):
 
         # 2) Code body
         code_body = QWidget(card)
-        code_body.setStyleSheet("background: #1E1E1E; border: none;")
+        code_body.setStyleSheet("background: transparent; border: none;")
         code_layout = QVBoxLayout(code_body)
         code_layout.setContentsMargins(20, 14, 20, 14)
         code_layout.setSpacing(2)
@@ -296,7 +296,7 @@ class ExercisePageWidget(QWidget):
         # so the entire card reads as one uniform surface (thin divider line
         # above only).
         status = QWidget(card)
-        status.setStyleSheet("background: #1E1E1E; border: none;")
+        status.setStyleSheet("background: transparent; border: none;")
         status.setFixedHeight(24)
         sl = QHBoxLayout(status)
         sl.setContentsMargins(12, 0, 12, 0)
@@ -324,7 +324,7 @@ class ExercisePageWidget(QWidget):
         console = QFrame(parent)
         console.setObjectName("ExerciseConsoleCard")
         console.setStyleSheet(
-            f"#ExerciseConsoleCard {{ background: #0F0F0F;"
+            f"#ExerciseConsoleCard {{ background: transparent;"
             f" border: 1px solid {VSCODE_GUTTER_BORDER}; }}"
         )
         console.setFixedHeight(72)
