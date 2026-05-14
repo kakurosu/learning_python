@@ -302,6 +302,18 @@ class ChapterView(QWidget):
         values = widget.collect_values()
 
         gr = grade_exercise(page, values, self.kernel)
+        # Defense against intermittent kernel cold-start: if the answer
+        # looks form-correct but the kernel reported a non-ok status, the
+        # most likely cause is a stale state / first-execution glitch.
+        # Retry once with a fresh kernel before declaring "Incorrect".
+        if (
+            not gr.overall_passed
+            and gr.form_passed
+            and gr.execution is not None
+            and gr.execution.status != "ok"
+        ):
+            self.kernel.restart()
+            gr = grade_exercise(page, values, self.kernel)
         self.repo.record_submission(
             user_id=self.user_id,
             chapter_id=self.chapter.id,

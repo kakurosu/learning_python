@@ -55,8 +55,20 @@ class KernelSession:
         self._client = self._mgr.client()
         self._client.start_channels()
         self._client.wait_for_ready(timeout=30)
-        # Set up matplotlib inline output so figures arrive as display_data PNGs.
+        self._warmup()
+
+    def _warmup(self) -> None:
+        """Run a tiny no-op + matplotlib setup so the kernel is fully ready.
+
+        Without this, the first ``execute()`` after start/restart can be
+        slow or behave oddly (matplotlib backend not configured, IPython
+        display hooks not yet initialised). The student submitting an
+        Exercise before pressing Run on the Sample would otherwise hit
+        this cold-start path and could get a spurious Incorrect.
+        """
         self.execute(
+            # `pass` warms the IPython execute pipeline.
+            "pass\n"
             "import matplotlib\n"
             "try:\n"
             "    get_ipython().run_line_magic('matplotlib', 'inline')\n"
@@ -90,6 +102,9 @@ class KernelSession:
         self._client = self._mgr.client()
         self._client.start_channels()
         self._client.wait_for_ready(timeout=30)
+        # The first ``execute()`` on a freshly-restarted kernel is unreliable
+        # without this — see ``_warmup`` docstring.
+        self._warmup()
 
     def interrupt(self) -> None:
         if self._mgr is None:
